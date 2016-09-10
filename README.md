@@ -1,2 +1,9 @@
-# nightmare-fiction
-Nightmare Fiction is an experimental game engine.
+# Nightmare Fiction Engine
+Nightmare Fiction is an experimental game engine that I've been writing to learn more about Modern OpenGL and C++. The oldest build uses OpenGL 2.x, so I decided to start it again from scratch.
+
+# Dependences
+OpenGL 3.3
+
+
+# License
+This project is licensed under the terms of the MIT license.

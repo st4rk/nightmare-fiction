@@ -4,6 +4,8 @@ Nightmare Fiction is an experimental game engine that I've been writing to learn
 # Dependences
 OpenGL 3.3
 
+# Credits
+LodePNG - PNG Image decoder library
 
 # License
 This project is licensed under the terms of the MIT license.

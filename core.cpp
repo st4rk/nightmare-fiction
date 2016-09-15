@@ -17,8 +17,10 @@ core::~core() {
  */
 void core::start() {
 	m_Render.initGL();
-	m_Input.setInputInfo(m_Render.getContext(), &c_Pad);
-	m_Utils.setContext(m_Render.getContext());
+	m_Input.setInputInfo(m_Render.getContext());
+	m_Utils.start(&m_Render);
+
+	m_Schedule.start(&m_Render, &m_Utils, &m_Input);
 
 	coreLoop = true;
 
@@ -32,12 +34,10 @@ void core::start() {
  */
 void core::mainLoop() {
 
-	nTexture *test = m_Render.loadTexture("resource/TITLE00.PNG");
-
 	while (coreLoop) {
 		m_Render.clearScene();
-		
-		m_Utils.renderRectangle(test->id, m_Render.getTexUnit());
+
+			m_Schedule.dispatch();
 
 		m_Render.swapBuffers();
 	}

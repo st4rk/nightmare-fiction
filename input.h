@@ -34,10 +34,11 @@ public:
 	input();
    ~input();
 
-   void setInputInfo(GLFWwindow* window, unsigned int *c_Pad);
-   void setInputInfo(unsigned int *c_Pad);
+   void setInputInfo(GLFWwindow* window);
    void setInputType(INPUT_CONFIGURATION inputType);
    void updateInput();
+
+   unsigned int getPad() const;
 
 private:
 	INPUT_CONFIGURATION inputType;
@@ -45,7 +46,7 @@ private:
 	void keyboardInput();
 	void joystickInput();
 	GLFWwindow* window;
-	unsigned int *c_Pad;
+	unsigned int c_Pad;
 };
 
 #endif

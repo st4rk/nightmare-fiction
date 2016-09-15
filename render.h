@@ -14,6 +14,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
 
 #include "shaders/loader.h"
 #include "lib/libstk.h"
@@ -34,6 +36,11 @@ struct nTexture {
 	GLuint id;
 };
 
+struct modelObj {
+	nTexture *tex;
+	GLuint vbo;
+};
+
 class render {
 public:
 	render();
@@ -42,6 +49,10 @@ public:
 	bool initGL();
 	void swapBuffers();
 	void clearScene();
+
+	void setPerspective(const float& angle, const int& width, const int& height);
+	void setCam(const glm::vec3& eye, const glm::vec3& center, const glm::vec3& up);
+
 	GLFWwindow* getContext();
 
 	nTexture* loadTexture(const std::string& dir);
@@ -52,7 +63,12 @@ private:
 	GLFWwindow *window;
 	GLuint programID;
 	GLuint texUnit;
+	GLuint mvpID;
 	GLuint vaoID;
+	
+	glm::mat4 p_Matrix; // projection matrix
+	glm::mat4 v_Matrix; // view matrix
+	glm::mat4 m_Matrix; // model matrix
 
 };
 

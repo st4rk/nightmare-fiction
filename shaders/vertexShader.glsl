@@ -5,9 +5,10 @@ layout(location = 1) in vec2 vertexUV;
 
 out vec2 UV;
 
-void main() {
-	gl_Position.xyz = vertexPosition_modelSpace;
-	gl_Position.w   = 1.0;
+uniform mat4 MVP;
 
+void main() {
+	gl_Position = MVP * vec4(vertexPosition_modelSpace, 1);
+	
 	UV = vertexUV;
 }

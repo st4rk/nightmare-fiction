@@ -10,9 +10,37 @@
 #define _UTILS_H_
 
 #include <iostream>
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
+#include <cstring>
+#include <vector>
+
+#include "render.h"
+
+enum FONT_TYPE {
+	FONT_TYPE_SMALL = 0,
+	FONT_TYPE_BIG   = 1
+};
+
+
+static const GLfloat vertex_rectangle_data[] = {
+   -1.0f, -1.0f, 0.0f,
+    1.0f, -1.0f, 0.0f,
+   -1.0f,  1.0f, 0.0f,
+
+
+    1.0f,  1.0f, 0.0f,
+   -1.0f,  1.0f, 0.0f,
+    1.0f, -1.0f, 0.0f
+};
+
+static const GLfloat vertex_rectangle_uv[] = {
+	0.0f, 0.0f,
+	1.0f, 0.0f,
+	0.0f, 1.0f,
+
+	1.0f, 1.0f,
+	0.0f, 1.0f,
+	1.0f, 0.0f,
+};
 
 
 
@@ -21,15 +49,21 @@ public:
 	utils();
    ~utils();
 
-   void setContext(GLFWwindow *window);
+   void start(render *m_Render);
    void renderRectangle(GLuint texID, GLuint textureUnit);
+   void renderText(const std::string& text, const float& Xo, const float& Yo, const float& Zo, const FONT_TYPE& font, GLuint textureUnit);
 
 private:
-	GLFWwindow* window;
 
 	GLuint textureUnit;
 	GLuint utilsTexture;
 	GLuint utilsVBO;
+
+	render *m_Render;
+
+	modelObj fontSet;
+
+	FONT_TYPE font;
 };
 
 #endif

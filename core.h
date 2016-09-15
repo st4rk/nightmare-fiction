@@ -18,6 +18,7 @@
 #include "render.h"
 #include "input.h"
 #include "utils.h"
+#include "sceneSchedule.h"
 
 class core {
 public:
@@ -31,8 +32,8 @@ private:
 	render m_Render;
 	input  m_Input;
 	utils  m_Utils;
+	schedule m_Schedule;
 
-	unsigned int c_Pad;
 	bool coreLoop;
 
 };

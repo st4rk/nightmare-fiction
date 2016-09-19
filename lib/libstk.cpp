@@ -10,8 +10,26 @@ libstk::libstk() {
 libstk::~libstk() {
 	if (texture != nullptr)
 		delete [] texture;
-
+	
+	width   = 0;
+	height  = 0;
 	texture = nullptr;
+}
+
+/*
+ * destroy
+ * dealloc all resource used
+ * no return
+ */
+void libstk::destroy() {
+	if (texture != nullptr) {
+		delete [] texture;
+		texture = nullptr;
+	}
+
+	width = 0;
+	height = 0;
+
 }
 
 
@@ -234,6 +252,10 @@ bool libstk::loadIMG(const std::string& dir ) {
 	 * check if it's a BITMAP
 	 */
 	if (!dir.compare(dir.size() - 4, 4, ".BMP")) {
+		return loadBMP(dir);
+	}
+	
+	if (!dir.compare(dir.size() - 4, 4, ".bmp")) {
 		return loadBMP(dir);
 	}
 

@@ -27,7 +27,10 @@ public:
 	libstk();
    ~libstk();
 
+    void destroy();
+
 	bool loadIMG(const std::string& dir);
+
 
 	unsigned int getWidth() const;
 	unsigned int getHeight() const;

@@ -52,7 +52,18 @@ unsigned int scene::getNextScene() const { return nextScene; }
  */
 SCENE_STATE scene::getState() const { return sceneState; }
 
-
+/* 
+ * stateMachine
+ * used to handle all scene state
+ */
 void scene::stateMachine() {
+
+}
+
+/*
+ * start
+ * start all scene resource
+ */
+void scene::start() {
 
 }

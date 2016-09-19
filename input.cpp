@@ -30,7 +30,7 @@ void input::setInputInfo(GLFWwindow* window) {
  * no return
  */
 
-void input::updateInput() {
+void input::update() {
 	switch (inputType) {
 		case INPUT_KEYBOARD:
 			keyboardInput();
@@ -86,6 +86,48 @@ void input::keyboardInput() {
  * no return
  */
 void input::joystickInput() {
+	int present = glfwJoystickPresent(GLFW_JOYSTICK_1);
+
+	present > 0 ? joyStatus = true : joyStatus = false;
+
+
+	if (present) {
+		int count;
+		const unsigned char* axes = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &count);
+
+		/*
+		for (int i = 0; i < count; i++) {
+			printf("i: %d button: %d\n", i, axes[i]);
+		}
+		*/
+
+		if ( axes[4] == GLFW_PRESS ) {
+			c_Pad = c_Pad | CORE_PAD_UP;
+		} else {
+			c_Pad = c_Pad & ~CORE_PAD_UP;
+		}
+
+		if ( axes[6] == GLFW_PRESS )
+			c_Pad = c_Pad | CORE_PAD_DOWN;
+		else
+			c_Pad = c_Pad & ~CORE_PAD_DOWN;
+
+		if ( axes[7] == GLFW_PRESS )
+			c_Pad = c_Pad | CORE_PAD_LEFT;
+		else
+			c_Pad = c_Pad & ~CORE_PAD_LEFT;
+
+		if ( axes[5] == GLFW_PRESS )
+			c_Pad = c_Pad | CORE_PAD_RIGHT;
+		else
+			c_Pad = c_Pad & ~CORE_PAD_RIGHT;
+
+		if ( axes[14] == GLFW_PRESS )
+			c_Pad = (c_Pad | CORE_PAD_OK);
+		else
+			c_Pad = c_Pad & ~CORE_PAD_OK;
+
+	}
 
 }
 
@@ -105,3 +147,6 @@ void input::setInputType(INPUT_CONFIGURATION inputType) {
  */
 
 unsigned int input::getPad() const { return c_Pad; }
+
+
+bool input::isJoystick() const { return joyStatus; }

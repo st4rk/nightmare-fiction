@@ -50,13 +50,17 @@ void schedule::dispatch() {
 	switch (sceneList[n_Scene]->getState()) {
 		case SCENE_STATE_INIT:
 			sceneList[n_Scene]->setContext(m_Render, m_Utils, m_Input);
+			sceneList[n_Scene]->start();
 			sceneList[n_Scene]->setState(SCENE_STATE_RUN);
 		break;
 
 		case SCENE_STATE_RUN:
 			sceneList[n_Scene]->stateMachine();
 		#ifdef DEBUG
-			m_Utils->renderText("Scene: 1", -0.9f, 0.9f, 0.0f, FONT_TYPE_SMALL, m_Render->getTexUnit());
+			char sceneNum[30];
+			memset(sceneNum, 0, 30);
+			sprintf(sceneNum, "Scene:%d\n", n_Scene);
+			m_Utils->renderText(sceneNum, -0.9f, 0.9f, 0.0f, FONT_TYPE_SMALL, m_Render->getTexUnit());
 		#endif
 		break;
 

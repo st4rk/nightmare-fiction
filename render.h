@@ -32,11 +32,31 @@ enum GL_INFORMATION {
 };
 
 struct nTexture {
+	void destroy() {
+		texture.destroy();
+		glDeleteTextures(1, &id);
+		id = 0;
+	}
+
 	libstk texture;
 	GLuint id;
 };
 
-struct modelObj {
+class modelObj {
+public:
+	modelObj() {
+		tex = nullptr;
+		vbo = 0;
+	}
+
+	~modelObj() {
+		if (tex != nullptr) {
+			tex->destroy();
+		}
+
+		glDeleteBuffers(1, &vbo);
+	}
+
 	nTexture *tex;
 	GLuint vbo;
 };

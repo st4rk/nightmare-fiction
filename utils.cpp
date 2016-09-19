@@ -9,10 +9,8 @@ utils::~utils() {
 	m_Render = nullptr;
 
 
-	fontSet.tex->id = 0;
-	delete [] fontSet.tex;
-	fontSet.tex = nullptr;
-	fontSet.vbo = 0;
+	fontSet.~modelObj();
+
 
 	glDeleteBuffers(1, &utilsVBO);
 	glDeleteBuffers(1, &utilsTexture);
@@ -95,6 +93,70 @@ void utils::renderText(const std::string& text, const float& Xo, const float& Yo
 				} else if (*it == ' ') {
 					x += 0.1f;
 				} else {
+					float u = 0.03125f * (*it % 32);
+					float v = 0.03125f * ((*it - 32)/32);
+
+					GLfloat xyz_uv_coord[] = {
+					   -0.03f    + x, -0.03f    + y, 0.0f,
+					    0.0f     + u,  0.97f   - v,
+
+					    0.03f    + x, -0.03f    + y, 0.0f,
+						0.03125f   + u,  0.97f   - v,
+
+					   -0.03f    + x,  0.03f    + y, 0.0f,
+						0.0f     + u,  0.999f  - v,
+
+					    0.03f    + x,  0.03f    + y, 0.0f,
+						0.03125f   + u,  0.999f  - v,
+
+					   -0.03f    + x,  0.03f    + y, 0.0f,
+						0.0f     + u,  0.999f  - v,
+
+					    0.03f    + x, -0.03f    + y, 0.0f,
+						0.03125f   + u,  0.97f   - v
+					};
+
+					vbo_buffer.insert (vbo_buffer.end(), xyz_uv_coord, xyz_uv_coord+30);
+					x += 0.075f;
+				}
+			}
+
+			glBindBuffer(GL_ARRAY_BUFFER, fontSet.vbo);
+			glBufferData(GL_ARRAY_BUFFER, vbo_buffer.size() * sizeof(GLfloat), &vbo_buffer[0], GL_STATIC_DRAW);
+			
+			glEnableVertexAttribArray(0);
+			glEnableVertexAttribArray(1);
+			
+				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (void*)0x0);
+				glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (void*)0xC);
+
+				glDrawArrays(GL_TRIANGLES, 0, 6 * text.length());
+		
+			
+			glDisableVertexAttribArray(0);
+			glDisableVertexAttribArray(1);
+
+
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindTexture(GL_TEXTURE_2D, 0);
+
+		}
+		break;
+
+		case FONT_TYPE_BIG: {
+			std::string::const_iterator it;
+			std::vector<GLfloat> vbo_buffer;
+			float x = Xo;
+			float y = Yo;
+
+			for (it = text.begin(); it != text.end(); it++) {
+
+				if (*it == '\n') {
+					x = Xo;
+					y -= 0.1f;
+				} else if (*it == ' ') {
+					x += 0.1f;
+				} else {
 					float u = 0.0545f  * (*it % 18);
 					float v = 0.0543f  * ((*it - 36)/18) - 0.0545f;
 
@@ -145,13 +207,12 @@ void utils::renderText(const std::string& text, const float& Xo, const float& Yo
 		}
 		break;
 
-		case FONT_TYPE_BIG: {
-
-		}
-		break;
-
 		default:
 			std::cout << "Invalid font type: " << font << std::endl;
 		break;
 	}
+}
+
+void utils::setupFadeEffect(const float& speed, const float& r, const float& g, const float& b, const FADE_EFFECT_TYPE& type) {
+	
 }

@@ -20,6 +20,8 @@
 #include "utils.h"
 #include "sceneSchedule.h"
 
+#define DEBUG
+
 class core {
 public:
 	core();

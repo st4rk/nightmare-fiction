@@ -20,6 +20,7 @@ public:
    	void setState(const SCENE_STATE& sceneState);
     void setContext(render *m_Render, utils *m_Utils, input *m_Input);
     virtual void stateMachine();
+    virtual void start();
 
     unsigned int getNextScene() const;
     SCENE_STATE getState() const;

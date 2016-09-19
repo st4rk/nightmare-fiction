@@ -20,12 +20,12 @@ enum INPUT_CONFIGURATION {
 };
 
 enum CORE_PAD_BUTTONS {
-	CORE_PAD_UP      = 0,
-	CORE_PAD_DOWN    = 1,
-	CORE_PAD_LEFT    = 2,
-	CORE_PAD_RIGHT   = 3,
-	CORE_PAD_OK      = 4,
-	CORE_PAD_CANCELL = 5
+	CORE_PAD_UP      = 0b00000001,
+	CORE_PAD_DOWN    = 0b00000010,
+	CORE_PAD_LEFT    = 0b00000100,
+	CORE_PAD_RIGHT   = 0b00001000,
+	CORE_PAD_OK      = 0b00010000,   
+	CORE_PAD_CANCELL = 0b00100000
 };
 
 
@@ -36,9 +36,11 @@ public:
 
    void setInputInfo(GLFWwindow* window);
    void setInputType(INPUT_CONFIGURATION inputType);
-   void updateInput();
+   void update();
 
    unsigned int getPad() const;
+
+   bool isJoystick() const;
 
 private:
 	INPUT_CONFIGURATION inputType;
@@ -47,6 +49,8 @@ private:
 	void joystickInput();
 	GLFWwindow* window;
 	unsigned int c_Pad;
+
+	bool joyStatus;
 };
 
 #endif

@@ -27,7 +27,7 @@ struct color {
 enum IMAGE_FORMAT {
 	IMAGE_FORMAT_BMP = 0,
 	IMAGE_FORMAT_TIM = 1,
-	IMAGE_FORMAT_PNG = 2
+	IMAGE_FORMAT_PNG = 2,
 };
 
 class libstk {
@@ -37,7 +37,7 @@ public:
 
     void destroy();
 
-	bool loadIMG(const std::string& dir);
+	bool loadIMG(const std::string& dir, bool remove = false, color rColor = {1.0f, 1.0f, 1.0f, 1.0f});
 
 
 	unsigned int getWidth() const;
@@ -48,7 +48,7 @@ public:
 	IMAGE_FORMAT getFormat() const;
 
 private:
-	bool loadBMP(const std::string& dir);
+	bool loadBMP(const std::string& dir, bool remove = false, color rColor = {1.0f, 1.0f, 1.0f, 1.0f});
 	bool loadPNG(const std::string& dir);
 	bool loadTIM(const std::string& dir);
 	

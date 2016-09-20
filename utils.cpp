@@ -39,7 +39,7 @@ void utils::start(render *m_Render) {
 	 * load font set
 	 */
 
-	fontSet.tex = m_Render->loadTexture("resource/font/1.BMP");
+	fontSet.tex = m_Render->loadTexture("resource/font/1.BMP", true, {0.0f, 0.0f, 0.0f, 0.0f});
 	fadeTexture.tex = m_Render->loadTexture("resource/ui/dummy.png");
 
 	glGenBuffers(1, &fontSet.vbo);
@@ -287,7 +287,7 @@ void utils::doFadeEffect() {
 			break;
 
 			case FADE_BLINK:
-
+			
 			break;
 
 			case FADE_IN_OUT:

@@ -25,6 +25,9 @@ public:
     unsigned int getNextScene() const;
     SCENE_STATE getState() const;
 
+    void setState(SCENE_STATE& sceneState);
+    void setNextScene(unsigned int& nextScene);
+
 protected:
 	SCENE_STATE sceneState;
 

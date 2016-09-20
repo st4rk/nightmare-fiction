@@ -40,7 +40,7 @@ void libstk::destroy() {
  * return true if success
  * return false if failed to load bitmap
  */
-bool libstk::loadBMP(const std::string& dir) {
+bool libstk::loadBMP(const std::string& dir, bool remove, color rColor) {
 	unsigned char *data = nullptr; 
 	FILE *bmp = NULL;
 	unsigned int size = 0;
@@ -88,9 +88,30 @@ bool libstk::loadBMP(const std::string& dir) {
 	if (bmpRawOffset == 0) bmpRawOffset = 54;
 	if (bmpRawSize == 0) bmpRawSize = width * height * 3;
 
-	texture = new unsigned char [bmpRawSize];
+	if (remove) {
+		texture = new unsigned char [width * height * 4];
+		unsigned char *raw = new unsigned char [bmpRawSize];
+		std::memcpy(raw, (data + bmpRawOffset), bmpRawSize);
 
-	std::memcpy(texture, (data + bmpRawOffset), bmpRawSize);
+		unsigned int j = 0;
+		for (unsigned int i = 0; i < bmpRawSize; i+=3, j+= 4) {
+			if ((raw[i] == rColor.r) && (raw[i+1] == rColor.g) && (raw[i+2] == rColor.b)) {
+				texture[j]   = 0;
+				texture[j+1] = 0;
+				texture[j+2] = 0;
+				texture[j+3] = 0;
+			} else {
+				texture[j]   = raw[i];
+				texture[j+1] = raw[i+1];
+				texture[j+2] = raw[i+2];
+				texture[j+3] = 255;
+			}
+		}
+
+	} else {
+		texture = new unsigned char [bmpRawSize];
+		std::memcpy(texture, (data + bmpRawOffset), bmpRawSize);
+	}
 
 	delete [] data;
 	data = nullptr;
@@ -242,7 +263,7 @@ bool libstk::loadTIM(const std::string& dir) {
  * return true if success
  * return false if error
  */
-bool libstk::loadIMG(const std::string& dir ) {
+bool libstk::loadIMG(const std::string& dir, bool remove, color rColor) {
 	if (dir.size() == 0) {
 		std::cout << "invalid dir !" << std::endl;
 		return false;
@@ -252,7 +273,7 @@ bool libstk::loadIMG(const std::string& dir ) {
 	 * check if it's a BITMAP
 	 */
 	if ((!dir.compare(dir.size() - 4, 4, ".BMP")) || (!dir.compare(dir.size() - 4, 4, ".bmp"))) {
-		return loadBMP(dir);
+		return loadBMP(dir, remove, rColor);
 	}
 
 	/*

@@ -15,10 +15,11 @@
  * in game, and other kind of stuff
  */
 #include "game/mainmenu/mainMenu.h"
+#include "game/mainmenu/config.h"
 
 enum GAME_SCENE_LIST {
 	GAME_SCENE_MAIN_MENU = 0,
-	GAME_SCENE_IN_GAME   = 1
+	GAME_SCENE_CONFIG   = 1
 };
 
 

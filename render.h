@@ -75,7 +75,7 @@ public:
 
 	GLFWwindow* getContext();
 
-	nTexture* loadTexture(const std::string& dir);
+	nTexture* loadTexture(const std::string& dir, bool remove = false, color rColor = {1.0f, 1.0f, 1.0f, 1.0f});
 
 	GLuint getTexUnit() const;
 	GLuint getProgramId() const;

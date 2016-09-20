@@ -67,3 +67,11 @@ void scene::stateMachine() {
 void scene::start() {
 
 }
+
+void scene::setState(SCENE_STATE& sceneState) { 
+	this->sceneState = sceneState;
+}
+
+void scene::setNextScene(unsigned int& nextScene) {
+	this->nextScene = nextScene;
+}

@@ -34,9 +34,11 @@ void schedule::start(render *m_Render, utils *m_Utils, input *m_Input) {
 	this->m_Utils  = m_Utils;
 	this->m_Input  = m_Input;
 
-	mainMenu *node = new mainMenu;
+	mainMenu *node_1 = new mainMenu;
+	menuConfig *node_2 = new menuConfig;
 
-	sceneList.push_back(static_cast<scene*>(node));
+	sceneList.push_back(static_cast<scene*>(node_1));
+	sceneList.push_back(static_cast<scene*>(node_2));
 
 }
 
@@ -48,10 +50,11 @@ void schedule::start(render *m_Render, utils *m_Utils, input *m_Input) {
 void schedule::dispatch() {
 
 	switch (sceneList[n_Scene]->getState()) {
-		case SCENE_STATE_INIT:
+		case SCENE_STATE_INIT: {
 			sceneList[n_Scene]->setContext(m_Render, m_Utils, m_Input);
 			sceneList[n_Scene]->start();
 			sceneList[n_Scene]->setState(SCENE_STATE_RUN);
+		}
 		break;
 
 		case SCENE_STATE_RUN: {
@@ -59,8 +62,13 @@ void schedule::dispatch() {
 		}
 		break;
 
-		case SCENE_STATE_SLEEP:
+		case SCENE_STATE_SLEEP: {
+			n_Scene = sceneList[n_Scene]->getNextScene();
 
+			if (sceneList[n_Scene]->getState() == SCENE_STATE_SLEEP) 
+				sceneList[n_Scene]->setState(SCENE_STATE_RUN);
+			
+		}
 		break;
 
 		case SCENE_STATE_END:

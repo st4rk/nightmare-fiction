@@ -122,10 +122,10 @@ GLFWwindow* render::getContext() { return window; }
  * this function is used to load textures
  * return texture ID
  */
-nTexture* render::loadTexture(const std::string& dir) {
+nTexture* render::loadTexture(const std::string& dir, bool remove, color rColor) {
 	nTexture *nTex = new nTexture();
 
-	if (!nTex->texture.loadIMG(dir)) {
+	if (!nTex->texture.loadIMG(dir, remove, rColor)) {
 		std::cout << "Failed while loading texture " << dir << std::endl;
 		return nullptr;
 	}
@@ -139,6 +139,12 @@ nTexture* render::loadTexture(const std::string& dir) {
 		break;
 
 		case IMAGE_FORMAT_BMP:
+			if (!remove)
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, nTex->texture.getWidth(), nTex->texture.getHeight(), 0, GL_BGR, GL_UNSIGNED_BYTE, nTex->texture.getTexture());
+			else
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, nTex->texture.getWidth(), nTex->texture.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, nTex->texture.getTexture());
+		break;
+
 		case IMAGE_FORMAT_TIM:
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, nTex->texture.getWidth(), nTex->texture.getHeight(), 0, GL_BGR, GL_UNSIGNED_BYTE, nTex->texture.getTexture());
 		break;

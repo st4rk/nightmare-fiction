@@ -251,18 +251,14 @@ bool libstk::loadIMG(const std::string& dir ) {
 	/*
 	 * check if it's a BITMAP
 	 */
-	if (!dir.compare(dir.size() - 4, 4, ".BMP")) {
-		return loadBMP(dir);
-	}
-	
-	if (!dir.compare(dir.size() - 4, 4, ".bmp")) {
+	if ((!dir.compare(dir.size() - 4, 4, ".BMP")) || (!dir.compare(dir.size() - 4, 4, ".bmp"))) {
 		return loadBMP(dir);
 	}
 
 	/*
 	 * check if it's a PNG
 	 */
-	if (!dir.compare(dir.size() - 4, 4, ".PNG")) {
+	if ((!dir.compare(dir.size() - 4, 4, ".PNG")) || (!dir.compare(dir.size() - 4, 4, ".png"))) {
 		return loadPNG(dir);
 	}
 

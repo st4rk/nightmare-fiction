@@ -78,6 +78,7 @@ public:
 	nTexture* loadTexture(const std::string& dir);
 
 	GLuint getTexUnit() const;
+	GLuint getProgramId() const;
 
 private:
 	GLFWwindow *window;

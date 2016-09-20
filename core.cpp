@@ -27,7 +27,7 @@ core::~core() {
 void core::start() {
 	m_Render.initGL();
 	m_Input.setInputInfo(m_Render.getContext());
-	m_Input.setInputType(INPUT_JOYSTICK);
+	m_Input.setInputType(INPUT_KEYBOARD);
 	m_Utils.start(&m_Render);
 
 	m_Schedule.start(&m_Render, &m_Utils, &m_Input);
@@ -46,29 +46,34 @@ void core::mainLoop() {
 
 	while (coreLoop) {
 		m_Render.clearScene();
-		m_Input.update();
 
+			m_Input.update();
 			m_Schedule.dispatch();
+			m_Utils.doFadeEffect();
 
-		#ifdef DEBUG
-			/*
-			 * TODO: Check if it's right
-			 *
-			 */
-			if (tmr1000 < glfwGetTime()) {
-				tmr1000 = glfwGetTime() + 1.0f;
-				tFps = fpsCount;
-				fpsCount = 0;
-			} else {
-				fpsCount++;
-			}
+			#ifdef DEBUG
+				/*
+				 * TODO: Check if it's right
+				 *
+				 */
+				if (tmr1000 < glfwGetTime()) {
+					tmr1000 = glfwGetTime() + 1.0f;
+					tFps = fpsCount;
+					fpsCount = 0;
+				} else {
+					fpsCount++;
+				}
 
-			char sceneNum[30];
-			memset(sceneNum, 0, 30);
-			sprintf(sceneNum, "fps:%d\n", tFps);
-			m_Utils.renderText(sceneNum, -0.9f, 0.8f, 0.0f, FONT_TYPE_SMALL, m_Render.getTexUnit());
-		
-		#endif
+				char sceneNum[30];
+				memset(sceneNum, 0, 30);
+				sprintf(sceneNum, "fps:%d", tFps);
+				m_Utils.renderText(sceneNum, -0.9f, 0.8f, 0.0f, FONT_TYPE_SMALL, m_Render.getTexUnit(), {1.0f, 0.0f, 0.0f, 1.0f});
+
+				memset(sceneNum, 0, 30);
+				sprintf(sceneNum, "Scene:%d", m_Schedule.getSceneNum());
+				m_Utils.renderText(sceneNum, -0.9f, 0.9f, 0.0f, FONT_TYPE_SMALL, m_Render.getTexUnit(), {1.0f, 1.0f, 1.0f, 1.0f});
+
+			#endif
 
 		m_Render.swapBuffers();
 	}

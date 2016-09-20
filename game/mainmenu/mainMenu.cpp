@@ -2,6 +2,7 @@
 
 mainMenu::mainMenu() {
 	layers = MAIN_MENU_LAYER_LOGO;
+	arrow = 0;
 }
 
 
@@ -13,6 +14,7 @@ mainMenu::~mainMenu() {
 		}
 	}
 
+	arrow = 0;
 }
 
 void mainMenu::start() {
@@ -25,54 +27,67 @@ void mainMenu::start() {
 	node = m_Render->loadTexture("resource/ui/mainMenu.bmp");
 	textureList.push_back(node);
 
+	m_Utils->setupFadeEffect(0.007f, 0.0f, 0.0f, 0.0f, FADE_IN_OUT);
+
 	layers = MAIN_MENU_LAYER_LOGO;
+}
+
+void mainMenu::checkInput() {
+	if (m_Input->getPad() & CORE_PAD_UP) 
+		if (arrow > 0) arrow--;
+
+	if (m_Input->getPad() & CORE_PAD_DOWN)
+		if (arrow < 1) arrow++;
 }
 
 void mainMenu::stateMachine() {
 	switch (layers) {
+
 		case MAIN_MENU_LAYER_LOGO: {
-			m_Utils->renderRectangle(textureList[MAIN_MENU_LAYER_LOGO]->id, m_Render->getTexUnit());
-			
-			/* FUN TIME : D */
-			m_Utils->renderText("-- INPUT TEST -- ", -0.7f, -0.5f, 0.0f, FONT_TYPE_SMALL, m_Render->getTexUnit());
-			if (m_Input->isJoystick()) {
-				m_Utils->renderText("Joy Connecteed", -0.7f, -0.6f, 0.0f, FONT_TYPE_SMALL, m_Render->getTexUnit());
-			} else {
-				m_Utils->renderText("No Joystick", -0.7f, -0.6f, 0.0f, FONT_TYPE_SMALL, m_Render->getTexUnit());
+			if (!m_Utils->isInFade()) {
+				m_Utils->setupFadeEffect(0.007f, 0.0f, 0.0f, 0.0f, FADE_IN_OUT);
+				layers = MAIN_MENU_LAYER_WARNING;
 			}
 
-			printf("%d\n", m_Input->getPad());
-			if (m_Input->getPad() & CORE_PAD_UP) {
-				m_Utils->renderText("BUTTON: UP", -0.7f, -0.8f, 0.0f, FONT_TYPE_SMALL, m_Render->getTexUnit());
-			}
-
-			if (m_Input->getPad() & CORE_PAD_DOWN) {
-				m_Utils->renderText("BUTTON: DOWN", -0.7f, -0.8f, 0.0f, FONT_TYPE_SMALL, m_Render->getTexUnit());
-			}
-
-			if (m_Input->getPad() & CORE_PAD_LEFT) {
-				m_Utils->renderText("BUTTON: LEFT", -0.7f, -0.8f, 0.0f, FONT_TYPE_SMALL, m_Render->getTexUnit());
-			}
-
-			if (m_Input->getPad() & CORE_PAD_RIGHT) {
-				m_Utils->renderText("BUTTON: RIGHT", -0.7f, -0.8f, 0.0f, FONT_TYPE_SMALL, m_Render->getTexUnit());
-			}
-
-			if (m_Input->getPad() & CORE_PAD_OK) {
-				m_Utils->renderText("BUTTON: X", -0.7f, -0.8f, 0.0f, FONT_TYPE_SMALL, m_Render->getTexUnit());
-			}
-
+			m_Utils->renderRectangle(textureList[MAIN_MENU_LAYER_LOGO]->id, m_Render->getTexUnit(), {1.0f, 1.0f, 1.0f, 1.0f});
 		}
 		break;
 
 		case MAIN_MENU_LAYER_WARNING: {
-			m_Utils->renderRectangle(textureList[MAIN_MENU_LAYER_WARNING]->id, m_Render->getTexUnit());
+			if (!m_Utils->isInFade()) {
+				m_Utils->setupFadeEffect(0.007f, 0.0f, 0.0f, 0.0f, FADE_OUT);
+				layers = MAIN_MENU_LAYER_SEL;
+			}
+
+			m_Utils->renderRectangle(textureList[MAIN_MENU_LAYER_WARNING]->id, m_Render->getTexUnit(), {1.0f, 1.0f, 1.0f, 1.0f});
 		}
 		break;
 
-		case MAIN_MENU_LAYER_START: {
-			m_Utils->renderRectangle(textureList[MAIN_MENU_LAYER_START]->id, m_Render->getTexUnit());
+		case MAIN_MENU_LAYER_SEL: {
+			m_Utils->renderRectangle(textureList[MAIN_MENU_LAYER_START]->id, m_Render->getTexUnit(), {1.0f, 1.0f, 1.0f, 1.0f});
+				
+			// check if the fade effect is end, so we can
+			// draw the main menu
+			if (!m_Utils->isInFade()) {
+				checkInput();
+
+				switch (arrow) {
+					case 0:
+						m_Utils->renderText("NEW GAMA", -0.25f, -0.5f, 0.0f, FONT_TYPE_SMALL, m_Render->getTexUnit(), {0.0f, 1.0f, 0.0f, 1.0f});
+						m_Utils->renderText("EXIT", -0.15f, -0.6f, 0.0f, FONT_TYPE_SMALL, m_Render->getTexUnit(), {1.0f, 1.0f, 1.0f, 1.0f});					
+					break;
+
+					case 1:
+						m_Utils->renderText("NEW", -0.25f, -0.5f, 0.0f, FONT_TYPE_SMALL, m_Render->getTexUnit(), {1.0f, 1.0f, 1.0f, 1.0f});
+						m_Utils->renderText("EXIT", -0.15f, -0.6f, 0.0f, FONT_TYPE_SMALL, m_Render->getTexUnit(), {0.0f, 1.0f, 0.0f, 1.0f});					
+					break;
+				}
+			}
 		}
+		break;
+
+		case MAIN_MENU_LAYER_START:
+
 		break;
 	}
 }

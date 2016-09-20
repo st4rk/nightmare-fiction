@@ -30,6 +30,9 @@ public:
    void start(render *m_Render, utils *m_Utils, input *m_Input);
    void dispatch();
 
+
+   unsigned int getSceneNum() const;
+
 private:
 	render *m_Render;
 	utils  *m_Utils;

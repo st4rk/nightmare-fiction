@@ -54,14 +54,9 @@ void schedule::dispatch() {
 			sceneList[n_Scene]->setState(SCENE_STATE_RUN);
 		break;
 
-		case SCENE_STATE_RUN:
+		case SCENE_STATE_RUN: {
 			sceneList[n_Scene]->stateMachine();
-		#ifdef DEBUG
-			char sceneNum[30];
-			memset(sceneNum, 0, 30);
-			sprintf(sceneNum, "Scene:%d\n", n_Scene);
-			m_Utils->renderText(sceneNum, -0.9f, 0.9f, 0.0f, FONT_TYPE_SMALL, m_Render->getTexUnit());
-		#endif
+		}
 		break;
 
 		case SCENE_STATE_SLEEP:
@@ -73,3 +68,6 @@ void schedule::dispatch() {
 		break;
 	}
 }
+
+
+unsigned int schedule::getSceneNum() const { return n_Scene; }

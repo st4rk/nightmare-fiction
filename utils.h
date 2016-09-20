@@ -47,30 +47,32 @@ enum FADE_EFFECT_TYPE {
 	FADE_IN,
 	FADE_OUT,
 	FADE_BLINK,
-	FADE_IN_OU
+	FADE_IN_OUT,
+	FADE_NONE
 };
 
 struct fadeEffect {
+	color r_Color;
 	float speed;
-	float r;
-	float g;
-	float b;
-
-	bool inFade;
 	unsigned char type;
+	bool inFade;
+	bool inOut;
 };
 
 class utils {
 public:
 	utils();
-   ~utils();
+	~utils();
 
-   void start(render *m_Render);
-   void renderRectangle(GLuint texID, GLuint textureUnit);
-   void renderText(const std::string& text, const float& Xo, const float& Yo, const float& Zo, const FONT_TYPE& font, GLuint textureUnit);
+	void start(render *m_Render);
+	void renderRectangle(const GLuint& texID, const GLuint& textureUnit, const color& r_Color);
+	void renderText(const std::string& text, const float& Xo, const float& Yo, const float& Zo, const FONT_TYPE& font, const GLuint& textureUnit,
+				    const color& r_Color);
 
-   void setupFadeEffect(const float &speed, const float &r, const float& g, const float& b,const FADE_EFFECT_TYPE& type);
+	void setupFadeEffect(const float &speed, const float &r, const float& g, const float& b,const FADE_EFFECT_TYPE& type);
+	void doFadeEffect();
 
+	bool isInFade() const;
 private:
 
 	GLuint textureUnit;
@@ -80,6 +82,9 @@ private:
 	render *m_Render;
 
 	modelObj fontSet;
+
+	fadeEffect fade;
+	modelObj fadeTexture;
 
 	FONT_TYPE font;
 };

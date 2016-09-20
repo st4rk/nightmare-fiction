@@ -102,6 +102,10 @@ bool render::initGL() {
 	// using the standard shader
 	glUseProgram(programID);
 
+	// enable alpha
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	return true;
 }
 
@@ -155,3 +159,9 @@ nTexture* render::loadTexture(const std::string& dir) {
  * return texture unit
  */
 GLuint render::getTexUnit() const { return texUnit; }
+
+/*
+ * getProgramId
+ * return current program id
+ */
+GLuint render::getProgramId() const { return programID; }

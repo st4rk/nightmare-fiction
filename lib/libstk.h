@@ -16,6 +16,14 @@
 
 #include "lodepng.h"
 
+
+struct color {
+	float r;
+	float g;
+	float b;
+	float a;
+};
+
 enum IMAGE_FORMAT {
 	IMAGE_FORMAT_BMP = 0,
 	IMAGE_FORMAT_TIM = 1,

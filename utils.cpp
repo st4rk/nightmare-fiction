@@ -12,7 +12,7 @@ utils::utils() {
 
 utils::~utils() {
 	m_Render = nullptr;
-	
+
 	fade.speed   = 0.0f;
 	fade.r_Color = {0.0f, 0.0f, 0.0f, 0.0f};
 	fade.type    = FADE_NONE;
@@ -81,20 +81,21 @@ void utils::renderRectangle(const GLuint& texID, const color& r_Color) {
 void utils::renderText(const std::string& text, const float& Xo, const float& Yo, const float& Zo, const FONT_TYPE& font,
    			     	   const color& r_Color) {
 
+	std::string::const_iterator it;
+	std::vector<GLfloat> vbo_buffer;
+
 	GLuint m_Color = glGetUniformLocation(m_Render->getProgramId(), "m_Color");
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, fontSet.tex->id);
 	glUniform4f(m_Color, r_Color.r, r_Color.g, r_Color.b, r_Color.a);
 
-	switch (font) {
-		case FONT_TYPE_SMALL: {
-			std::string::const_iterator it;
-			std::vector<GLfloat> vbo_buffer;
-			float x = Xo;
-			float y = Yo;
+	float x = Xo;
+	float y = Yo;
 
-			for (it = text.begin(); it != text.end(); ++it) {
+	for (it = text.begin(); it != text.end(); ++it) {
+		switch (font) {
+			case FONT_TYPE_SMALL: {
 
 				if (*it == '\n') {
 					x = Xo;
@@ -128,26 +129,11 @@ void utils::renderText(const std::string& text, const float& Xo, const float& Yo
 					vbo_buffer.insert (vbo_buffer.end(), xyz_uv_coord, xyz_uv_coord+30);
 					x += 0.060f;
 				}
+
 			}
+			break;
 
-			glBindBuffer(GL_ARRAY_BUFFER, fontSet.vbo);
-			glBufferData(GL_ARRAY_BUFFER, vbo_buffer.size() * sizeof(GLfloat), &vbo_buffer[0], GL_STREAM_DRAW);
-			
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (void*)0x0);
-			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (void*)0xC);
-
-			glDrawArrays(GL_TRIANGLES, 0, 6 * text.length());
-
-		}
-		break;
-
-		case FONT_TYPE_BIG: {
-			std::string::const_iterator it;
-			std::vector<GLfloat> vbo_buffer;
-			float x = Xo;
-			float y = Yo;
-
-			for (it = text.begin(); it != text.end(); ++it) {
+			case FONT_TYPE_BIG: {
 
 				if (*it == '\n') {
 					x = Xo;
@@ -182,23 +168,17 @@ void utils::renderText(const std::string& text, const float& Xo, const float& Yo
 					x += 0.1f;
 				}
 			}
-
-			glBindBuffer(GL_ARRAY_BUFFER, fontSet.vbo);
-			glBufferData(GL_ARRAY_BUFFER, vbo_buffer.size() * sizeof(GLfloat), &vbo_buffer[0], GL_STREAM_DRAW);
-			
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (void*)0x0);
-			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (void*)0xC);
-
-			glDrawArrays(GL_TRIANGLES, 0, 6 * text.length());
-
+			break;
 		}
-		break;
-
-		default:
-			std::cout << "Invalid font type: " << font << std::endl;
-		break;
 	}
 
+	glBindBuffer(GL_ARRAY_BUFFER, fontSet.vbo);
+	glBufferData(GL_ARRAY_BUFFER, vbo_buffer.size() * sizeof(GLfloat), &vbo_buffer[0], GL_STREAM_DRAW);
+	
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (void*)0x0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (void*)0xC);
+
+	glDrawArrays(GL_TRIANGLES, 0, 6 * text.length());
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);

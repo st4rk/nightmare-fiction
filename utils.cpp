@@ -57,13 +57,13 @@ void utils::start(render *m_Render) {
  * this function render a rectangle
  * no return
  */
-void utils::renderRectangle(const GLuint& texID, const GLuint& textureUnit, const color& r_Color) {
+void utils::renderRectangle(const GLuint& texID, const color& r_Color) {
 	GLuint m_Color = glGetUniformLocation(m_Render->getProgramId(), "m_Color");
 	
 	glUniform4f(m_Color, r_Color.r, r_Color.g, r_Color.b, r_Color.a);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texID);
-	glUniform1i(textureUnit, 0);
+
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, utilsVBO);
@@ -78,7 +78,9 @@ void utils::renderRectangle(const GLuint& texID, const GLuint& textureUnit, cons
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 /*
@@ -86,14 +88,13 @@ void utils::renderRectangle(const GLuint& texID, const GLuint& textureUnit, cons
  * This function is used to render bitmap fonts
  * no return
  */
-void utils::renderText(const std::string& text, const float& Xo, const float& Yo, const float& Zo, const FONT_TYPE& font, const GLuint& textureUnit,
+void utils::renderText(const std::string& text, const float& Xo, const float& Yo, const float& Zo, const FONT_TYPE& font,
    			     	   const color& r_Color) {
 
 	GLuint m_Color = glGetUniformLocation(m_Render->getProgramId(), "m_Color");
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, fontSet.tex->id);
-	glUniform1i(textureUnit, 0);
 
 	switch (font) {
 		case FONT_TYPE_SMALL: {
@@ -102,7 +103,7 @@ void utils::renderText(const std::string& text, const float& Xo, const float& Yo
 			float x = Xo;
 			float y = Yo;
 
-			for (it = text.begin(); it != text.end(); it++) {
+			for (it = text.begin(); it != text.end(); ++it) {
 
 				if (*it == '\n') {
 					x = Xo;
@@ -167,7 +168,7 @@ void utils::renderText(const std::string& text, const float& Xo, const float& Yo
 			float x = Xo;
 			float y = Yo;
 
-			for (it = text.begin(); it != text.end(); it++) {
+			for (it = text.begin(); it != text.end(); ++it) {
 
 				if (*it == '\n') {
 					x = Xo;
@@ -287,7 +288,7 @@ void utils::doFadeEffect() {
 			break;
 
 			case FADE_BLINK:
-			
+
 			break;
 
 			case FADE_IN_OUT:
@@ -300,7 +301,7 @@ void utils::doFadeEffect() {
 		}
 
 
-		renderRectangle(fadeTexture.tex->id, m_Render->getTexUnit(), fade.r_Color);
+		renderRectangle(fadeTexture.tex->id, fade.r_Color);
 	}
 
 }

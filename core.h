@@ -14,13 +14,12 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <sstream>
 
 #include "render.h"
 #include "input.h"
 #include "utils.h"
 #include "sceneSchedule.h"
-
-#define DEBUG
 
 class core {
 public:

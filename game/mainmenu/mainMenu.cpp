@@ -78,7 +78,7 @@ void mainMenu::stateMachine() {
 				layers = MAIN_MENU_LAYER_WARNING;
 			}
 
-			m_Utils->renderRectangle(textureList[MAIN_MENU_LAYER_LOGO]->id, m_Render->getTexUnit(), {1.0f, 1.0f, 1.0f, 1.0f});
+			m_Utils->renderRectangle(textureList[MAIN_MENU_LAYER_LOGO]->id, {1.0f, 1.0f, 1.0f, 1.0f});
 		}
 		break;
 
@@ -88,12 +88,12 @@ void mainMenu::stateMachine() {
 				layers = MAIN_MENU_LAYER_SEL;
 			}
 
-			m_Utils->renderRectangle(textureList[MAIN_MENU_LAYER_WARNING]->id, m_Render->getTexUnit(), {1.0f, 1.0f, 1.0f, 1.0f});
+			m_Utils->renderRectangle(textureList[MAIN_MENU_LAYER_WARNING]->id, {1.0f, 1.0f, 1.0f, 1.0f});
 		}
 		break;
 
 		case MAIN_MENU_LAYER_SEL: {
-			m_Utils->renderRectangle(textureList[MAIN_MENU_LAYER_START]->id, m_Render->getTexUnit(), {1.0f, 1.0f, 1.0f, 1.0f});
+			m_Utils->renderRectangle(textureList[MAIN_MENU_LAYER_START]->id, {1.0f, 1.0f, 1.0f, 1.0f});
 				
 			// check if the fade effect is end, so we can
 			// draw the main menu
@@ -102,21 +102,21 @@ void mainMenu::stateMachine() {
 
 				switch (arrow) {
 					case 0:
-						m_Utils->renderText("NEW GAME", -0.25f, -0.5f, 0.0f, FONT_TYPE_SMALL, m_Render->getTexUnit(), {0.0f, 1.0f, 0.0f, 1.0f});
-						m_Utils->renderText("OPTIONS", -0.23f, -0.6f, 0.0f, FONT_TYPE_SMALL, m_Render->getTexUnit(), {1.0f, 1.0f, 1.0f, 1.0f});					
-						m_Utils->renderText("EXIT", -0.15f, -0.7f, 0.0f, FONT_TYPE_SMALL, m_Render->getTexUnit(), {1.0f, 1.0f, 1.0f, 1.0f});										
+						m_Utils->renderText("NEW GAME", -0.25f, -0.5f, 0.0f, FONT_TYPE_SMALL, {0.0f, 1.0f, 0.0f, 1.0f});
+						m_Utils->renderText("OPTIONS", -0.23f, -0.6f, 0.0f, FONT_TYPE_SMALL, {1.0f, 1.0f, 1.0f, 1.0f});					
+						m_Utils->renderText("EXIT", -0.15f, -0.7f, 0.0f, FONT_TYPE_SMALL, {1.0f, 1.0f, 1.0f, 1.0f});										
 					break;
 
 					case 1:
-						m_Utils->renderText("NEW GAME", -0.25f, -0.5f, 0.0f, FONT_TYPE_SMALL, m_Render->getTexUnit(), {1.0f, 1.0f, 1.0f, 1.0f});
-						m_Utils->renderText("OPTIONS", -0.23f, -0.6f, 0.0f, FONT_TYPE_SMALL, m_Render->getTexUnit(), {0.0f, 1.0f, 0.0f, 1.0f});					
-						m_Utils->renderText("EXIT", -0.15f, -0.7f, 0.0f, FONT_TYPE_SMALL, m_Render->getTexUnit(), {1.0f, 1.0f, 1.0f, 1.0f});										
+						m_Utils->renderText("NEW GAME", -0.25f, -0.5f, 0.0f, FONT_TYPE_SMALL, {1.0f, 1.0f, 1.0f, 1.0f});
+						m_Utils->renderText("OPTIONS", -0.23f, -0.6f, 0.0f, FONT_TYPE_SMALL, {0.0f, 1.0f, 0.0f, 1.0f});					
+						m_Utils->renderText("EXIT", -0.15f, -0.7f, 0.0f, FONT_TYPE_SMALL, {1.0f, 1.0f, 1.0f, 1.0f});										
 					break;
 
 					case 2:
-						m_Utils->renderText("NEW GAME", -0.25f, -0.5f, 0.0f, FONT_TYPE_SMALL, m_Render->getTexUnit(), {1.0f, 1.0f, 1.0f, 1.0f});
-						m_Utils->renderText("OPTIONS", -0.23f, -0.6f, 0.0f, FONT_TYPE_SMALL, m_Render->getTexUnit(), {1.0f, 1.0f, 1.0f, 1.0f});					
-						m_Utils->renderText("EXIT", -0.15f, -0.7f, 0.0f, FONT_TYPE_SMALL, m_Render->getTexUnit(), {0.0f, 1.0f, 0.0f, 1.0f});					
+						m_Utils->renderText("NEW GAME", -0.25f, -0.5f, 0.0f, FONT_TYPE_SMALL, {1.0f, 1.0f, 1.0f, 1.0f});
+						m_Utils->renderText("OPTIONS", -0.23f, -0.6f, 0.0f, FONT_TYPE_SMALL, {1.0f, 1.0f, 1.0f, 1.0f});					
+						m_Utils->renderText("EXIT", -0.15f, -0.7f, 0.0f, FONT_TYPE_SMALL, {0.0f, 1.0f, 0.0f, 1.0f});					
 					break;
 				}
 			}
@@ -124,7 +124,7 @@ void mainMenu::stateMachine() {
 		break;
 
 		case MAIN_MENU_LAYER_CONFIG:{
-			m_Utils->renderRectangle(textureList[MAIN_MENU_LAYER_START]->id, m_Render->getTexUnit(), {1.0f, 1.0f, 1.0f, 1.0f});
+			m_Utils->renderRectangle(textureList[MAIN_MENU_LAYER_START]->id, {1.0f, 1.0f, 1.0f, 1.0f});
 		
 			if (!m_Utils->isInFade()) {
 				m_Utils->setupFadeEffect(0.007f, 0.0f, 0.0f, 0.0f, FADE_OUT);

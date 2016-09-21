@@ -64,14 +64,15 @@ void core::mainLoop() {
 					fpsCount++;
 				}
 
-				char sceneNum[30];
-				memset(sceneNum, 0, 30);
-				sprintf(sceneNum, "fps:%d", tFps);
-				m_Utils.renderText(sceneNum, -0.9f, 0.8f, 0.0f, FONT_TYPE_SMALL, m_Render.getTexUnit(), {1.0f, 0.0f, 0.0f, 1.0f});
+				std::stringstream fps;
+				std::stringstream sceneNum;
 
-				memset(sceneNum, 0, 30);
-				sprintf(sceneNum, "Scene:%d", m_Schedule.getSceneNum());
-				m_Utils.renderText(sceneNum, -0.9f, 0.9f, 0.0f, FONT_TYPE_SMALL, m_Render.getTexUnit(), {1.0f, 1.0f, 1.0f, 1.0f});
+				fps << "fps:" << tFps;
+
+				m_Utils.renderText(fps.str(), -0.9f, 0.8f, 0.0f, FONT_TYPE_SMALL, {1.0f, 0.0f, 0.0f, 1.0f});
+
+				sceneNum << "Scene:" << m_Schedule.getSceneNum();
+				m_Utils.renderText(sceneNum.str(), -0.9f, 0.9f, 0.0f, FONT_TYPE_SMALL, {1.0f, 1.0f, 1.0f, 1.0f});
 
 			#endif
 

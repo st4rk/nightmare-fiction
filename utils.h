@@ -65,8 +65,8 @@ public:
 	~utils();
 
 	void start(render *m_Render);
-	void renderRectangle(const GLuint& texID, const GLuint& textureUnit, const color& r_Color);
-	void renderText(const std::string& text, const float& Xo, const float& Yo, const float& Zo, const FONT_TYPE& font, const GLuint& textureUnit,
+	void renderRectangle(const GLuint& texID, const color& r_Color);
+	void renderText(const std::string& text, const float& Xo, const float& Yo, const float& Zo, const FONT_TYPE& font,
 				    const color& r_Color);
 
 	void setupFadeEffect(const float &speed, const float &r, const float& g, const float& b,const FADE_EFFECT_TYPE& type);

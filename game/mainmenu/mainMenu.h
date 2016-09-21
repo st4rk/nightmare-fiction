@@ -11,6 +11,8 @@ enum MAIN_MENU_LAYERS {
 	MAIN_MENU_LAYER_CONFIG
 };
 
+#define TOTAL_ENTRY 3
+
 class mainMenu: public scene {
 public:
 	mainMenu();
@@ -26,6 +28,8 @@ private:
 	std::vector<nTexture*> textureList;
 
 	MAIN_MENU_LAYERS layers;
+
+	_menu startMenu[TOTAL_ENTRY];
 
 	unsigned char arrow;
 	bool pressed;

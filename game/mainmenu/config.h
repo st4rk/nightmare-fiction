@@ -8,6 +8,8 @@ enum CONFIG_LAYERS {
 	CONFIG_LAYER_END
 };
 
+#define TOTAL_ENTRY 3
+
 class menuConfig : public scene {
 public:
 
@@ -24,6 +26,8 @@ private:
 	
 	unsigned char arrow;
 	bool pressed;
+
+	_menu configMenu[TOTAL_ENTRY];
 
 	nTexture *bg;
 };

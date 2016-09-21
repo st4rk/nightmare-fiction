@@ -32,8 +32,7 @@ enum GL_INFORMATION {
 };
 
 struct nTexture {
-	void destroy() {
-		texture.destroy();
+	~nTexture() {;
 		glDeleteTextures(1, &id);
 		id = 0;
 	}
@@ -51,7 +50,8 @@ public:
 
 	~modelObj() {
 		if (tex != nullptr) {
-			tex->destroy();
+			delete tex;
+			tex = nullptr;
 		}
 
 		glDeleteBuffers(1, &vbo);

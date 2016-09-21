@@ -12,6 +12,14 @@ enum SCENE_STATE {
 	SCENE_STATE_END
 };
 
+struct _menu {
+	std::string text;
+
+	float x;
+	float y;
+	float z;
+};
+
 class scene {
 public:
 	scene();

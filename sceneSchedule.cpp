@@ -34,11 +34,11 @@ void schedule::start(render *m_Render, utils *m_Utils, input *m_Input) {
 	this->m_Utils  = m_Utils;
 	this->m_Input  = m_Input;
 
-	mainMenu *node_1 = new mainMenu;
+	mainMenu   *node_1 = new mainMenu;
 	menuConfig *node_2 = new menuConfig;
 
-	sceneList.push_back(static_cast<scene*>(node_1));
-	sceneList.push_back(static_cast<scene*>(node_2));
+	sceneList.push_back((node_1));
+	sceneList.push_back((node_2));
 
 }
 
@@ -67,7 +67,7 @@ void schedule::dispatch() {
 
 			if (sceneList[n_Scene]->getState() == SCENE_STATE_SLEEP) 
 				sceneList[n_Scene]->setState(SCENE_STATE_RUN);
-			
+
 		}
 		break;
 

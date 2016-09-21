@@ -11,7 +11,7 @@ mainMenu::~mainMenu() {
 
 	if (textureList.size() > 0) {
 		for (unsigned int i = 0; i < textureList.size(); i++) {
-			textureList[i]->destroy();
+			delete textureList[i];
 		}
 	}
 
@@ -32,6 +32,15 @@ void mainMenu::start() {
 	m_Utils->setupFadeEffect(0.007f, 0.0f, 0.0f, 0.0f, FADE_IN_OUT);
 
 	layers = MAIN_MENU_LAYER_LOGO;
+
+	/* 
+	 * initialize the startMenu struct
+	 */
+
+	 startMenu[0] = {"NEW GAME", -0.25f, -0.5f, 0.0f};
+	 startMenu[1] = {"OPTIONS", -0.23f, -0.6f, 0.0f};
+	 startMenu[2] = {"EXIT", -0.15f, -0.7f, 0.0f};
+
 }
 
 void mainMenu::checkInput() {
@@ -100,25 +109,17 @@ void mainMenu::stateMachine() {
 			if (!m_Utils->isInFade()) {
 				checkInput();
 
-				switch (arrow) {
-					case 0:
-						m_Utils->renderText("NEW GAME", -0.25f, -0.5f, 0.0f, FONT_TYPE_SMALL, {0.0f, 1.0f, 0.0f, 1.0f});
-						m_Utils->renderText("OPTIONS", -0.23f, -0.6f, 0.0f, FONT_TYPE_SMALL, {1.0f, 1.0f, 1.0f, 1.0f});					
-						m_Utils->renderText("EXIT", -0.15f, -0.7f, 0.0f, FONT_TYPE_SMALL, {1.0f, 1.0f, 1.0f, 1.0f});										
-					break;
+				for (int i = 0; i < TOTAL_ENTRY; i++) {
+					color r_Color;
 
-					case 1:
-						m_Utils->renderText("NEW GAME", -0.25f, -0.5f, 0.0f, FONT_TYPE_SMALL, {1.0f, 1.0f, 1.0f, 1.0f});
-						m_Utils->renderText("OPTIONS", -0.23f, -0.6f, 0.0f, FONT_TYPE_SMALL, {0.0f, 1.0f, 0.0f, 1.0f});					
-						m_Utils->renderText("EXIT", -0.15f, -0.7f, 0.0f, FONT_TYPE_SMALL, {1.0f, 1.0f, 1.0f, 1.0f});										
-					break;
+					if (i == arrow)
+						r_Color = {0.0f, 1.0f, 0.0f, 1.0f};
+					else
+						r_Color = {1.0f, 1.0f, 1.0f, 1.0f};
 
-					case 2:
-						m_Utils->renderText("NEW GAME", -0.25f, -0.5f, 0.0f, FONT_TYPE_SMALL, {1.0f, 1.0f, 1.0f, 1.0f});
-						m_Utils->renderText("OPTIONS", -0.23f, -0.6f, 0.0f, FONT_TYPE_SMALL, {1.0f, 1.0f, 1.0f, 1.0f});					
-						m_Utils->renderText("EXIT", -0.15f, -0.7f, 0.0f, FONT_TYPE_SMALL, {0.0f, 1.0f, 0.0f, 1.0f});					
-					break;
+					m_Utils->renderText(startMenu[i].text,startMenu[i].x, startMenu[i].y, startMenu[i].z, FONT_TYPE_SMALL, r_Color);
 				}
+
 			}
 		}
 		break;

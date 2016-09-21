@@ -105,7 +105,11 @@ bool render::initGL() {
 	// enable alpha
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+	
+	// enable the two location used in code		
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	
 	return true;
 }
 

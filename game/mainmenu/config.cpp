@@ -9,7 +9,7 @@ menuConfig::menuConfig() {
 
 menuConfig::~menuConfig() {
 	if (bg != nullptr) {
-		bg->destroy();
+		delete bg;
 		bg = nullptr;
 	}
 }
@@ -52,6 +52,11 @@ void menuConfig::checkInput() {
 void menuConfig::start() {
 	layers = CONFIG_LAYER_INIT;
 	bg = m_Render->loadTexture("resource/ui/TITLE00.PNG");
+
+	configMenu[0] = {"PLACEHOLDER 1", -0.5f, -0.5f, 0.0f};
+	configMenu[1] = {"PLACEHOLDER 2", -0.5f, -0.6f, 0.0f};
+	configMenu[2] = {"EXIT", -0.1f, -0.7f, 0.0f};
+
 }
 
 void menuConfig::stateMachine() {
@@ -68,27 +73,18 @@ void menuConfig::stateMachine() {
 			checkInput();
 			m_Utils->renderRectangle(bg->id, {1.0f, 1.0f, 1.0f, 1.0f});			
 
-			switch (arrow) {
-				case 0:
-					m_Utils->renderText("PLACEHOLDER 1", -0.5f, -0.5f, 0.0f, FONT_TYPE_BIG, {0.0f, 1.0f, 0.0f, 1.0f});
-					m_Utils->renderText("PLACEHOLDER 2", -0.5f, -0.6f, 0.0f, FONT_TYPE_BIG, {1.0f, 1.0f, 1.0f, 1.0f});
-					m_Utils->renderText("EXIT", -0.1f, -0.7f, 0.0f, FONT_TYPE_BIG, {1.0f, 1.0f, 1.0f, 1.0f});
-				
-				break;
 
-				case 1:
-					m_Utils->renderText("PLACEHOLDER 1", -0.5f, -0.5f, 0.0f, FONT_TYPE_BIG, {1.0f, 1.0f, 1.0f, 1.0f});
-					m_Utils->renderText("PLACEHOLDER 2", -0.5f, -0.6f, 0.0f, FONT_TYPE_BIG, {0.0f, 1.0f, 0.0f, 1.0f});
-					m_Utils->renderText("EXIT", -0.1f, -0.7f, 0.0f, FONT_TYPE_BIG, {1.0f, 1.0f, 1.0f, 1.0f});
-				break;
+			for (int i = 0; i < TOTAL_ENTRY; i++) {
+				color r_Color;
 
-				case 2:
-					m_Utils->renderText("PLACEHOLDER 1", -0.5f, -0.5f, 0.0f, FONT_TYPE_BIG, {1.0f, 1.0f, 1.0f, 1.0f});
-					m_Utils->renderText("PLACEHOLDER 2", -0.5f, -0.6f, 0.0f, FONT_TYPE_BIG, {1.0f, 1.0f, 1.0f, 1.0f});
-					m_Utils->renderText("EXIT", -0.1f, -0.7f, 0.0f, FONT_TYPE_BIG,  {0.0f, 1.0f, 0.0f, 1.0f});
-				break;
+				if (i == arrow)
+					r_Color = {0.0f, 1.0f, 0.0f, 1.0f};
+				else
+					r_Color = {1.0f, 1.0f, 1.0f, 1.0f};
 
+				m_Utils->renderText(configMenu[i].text,configMenu[i].x, configMenu[i].y, configMenu[i].z, FONT_TYPE_BIG, r_Color);
 			}
+
 
 		break;
 

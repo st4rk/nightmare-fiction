@@ -16,10 +16,13 @@
  */
 #include "game/mainmenu/mainMenu.h"
 #include "game/mainmenu/config.h"
+#include "game/vrmode/mainGame.h"
 
 enum GAME_SCENE_LIST {
-	GAME_SCENE_MAIN_MENU = 0,
-	GAME_SCENE_CONFIG   = 1
+	GAME_SCENE_MAIN_MENU,
+	GAME_SCENE_CONFIG,
+	GAME_SCENE_VR_MODE,
+	GAME_SCENE_END
 };
 
 

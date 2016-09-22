@@ -11,34 +11,53 @@ render::~render() {
 	vaoID  = 0;
 }
 
+
 /*
- * setPerspective
- * modify the game perspective
+ * setProjectionMtx
+ * change projection matrix to a new one
  * no return
  */
-void render::setPerspective(const float& angle, const int& width, const int& height) {
-	// TODO: arbitrary values to NEAR and FAR
-	p_Matrix = glm::perspective(glm::radians(angle), (float) width / (float) height, 0.1f, 100.0f);
+void render::setProjectionMtx(const glm::mat4& p_Matrix) {
+	this->p_Matrix = p_Matrix;
+	updateMVP();
 }
 
 /*
- * setCam
- * modify the game camera using lookAt
+ * setViewMtx
+ * change view matrix to a new one
  * no return
  */
-void render::setCam(const glm::vec3& eye, const glm::vec3& center, const glm::vec3& up) {
-	v_Matrix = glm::lookAt(eye, center, up);
+void render::setViewMtx(const glm::mat4& v_Matrix) {
+	this->v_Matrix = v_Matrix;
+	updateMVP();
 }
 
+/*
+ * setModelMtx
+ * change model matrix to a new one
+ * no return
+ */
+void render::setModelMtx(const glm::mat4& m_Matrix) {
+	this->m_Matrix = m_Matrix;
+	updateMVP();
+}
+
+/*
+ * PRIVATE FUNCTION
+ * updateMVP
+ * update model, view, projection matrix 
+ * no return
+ */
+void render::updateMVP() {
+	glm::mat4 mvp = p_Matrix * v_Matrix * m_Matrix;
+	glUniformMatrix4fv(mvpID, 1, GL_FALSE, &mvp[0][0]);
+}
 
 /*
  * swapBuffers
- * update mvp matrix, rendering scene and poll events
+ * rendering scene and poll events
  */
 void render::swapBuffers() {	
-	glm::mat4 mvp = p_Matrix * v_Matrix * m_Matrix;
-	glUniformMatrix4fv(mvpID, 1, GL_FALSE, &mvp[0][0]);
-
 	glfwSwapBuffers(window);
 	glfwPollEvents();
 }
@@ -69,7 +88,7 @@ bool render::initGL() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, GL_CTX_MAJOR_VERSION);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, GL_CTX_MINOR_VERSION); // using OpenGL 3.3
 
-	window = glfwCreateWindow(RENDER_RES_WIDTH, RENDER_RES_HEIGHT, "NF Framework - 0.02a", NULL, NULL);
+	window = glfwCreateWindow(RENDER_RES_WIDTH, RENDER_RES_HEIGHT, "NF Framework - 0.03a", NULL, NULL);
 
 	if (window == NULL) {
 		std::cout << "Error while creating a window, verify if your GPU support GL Version: " <<

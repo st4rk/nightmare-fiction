@@ -26,9 +26,7 @@ private:
 	
 	unsigned char arrow;
 	bool pressed;
-
-	_menu configMenu[TOTAL_ENTRY];
-
+	
 	nTexture *bg;
 };
 

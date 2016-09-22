@@ -32,7 +32,7 @@ enum GL_INFORMATION {
 };
 
 struct nTexture {
-	~nTexture() {;
+	~nTexture() {
 		glDeleteTextures(1, &id);
 		id = 0;
 	}
@@ -70,8 +70,9 @@ public:
 	void swapBuffers();
 	void clearScene();
 
-	void setPerspective(const float& angle, const int& width, const int& height);
-	void setCam(const glm::vec3& eye, const glm::vec3& center, const glm::vec3& up);
+	void setProjectionMtx(const glm::mat4& p_Matrix);
+	void setViewMtx(const glm::mat4& v_Matrix);
+	void setModelMtx(const glm::mat4& m_Matrix);
 
 	GLFWwindow* getContext();
 
@@ -81,6 +82,8 @@ public:
 	GLuint getProgramId() const;
 
 private:
+	void updateMVP();
+
 	GLFWwindow *window;
 	GLuint programID;
 	GLuint texUnit;

@@ -24,12 +24,9 @@ public:
 private:
 	void checkInput();
 
-
 	std::vector<nTexture*> textureList;
 
 	MAIN_MENU_LAYERS layers;
-
-	_menu startMenu[TOTAL_ENTRY];
 
 	unsigned char arrow;
 	bool pressed;

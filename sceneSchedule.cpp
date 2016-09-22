@@ -36,9 +36,11 @@ void schedule::start(render *m_Render, utils *m_Utils, input *m_Input) {
 
 	mainMenu   *node_1 = new mainMenu;
 	menuConfig *node_2 = new menuConfig;
+	mainGame   *node_3 = new mainGame;
 
 	sceneList.push_back((node_1));
 	sceneList.push_back((node_2));
+	sceneList.push_back((node_3));
 
 }
 
@@ -71,8 +73,12 @@ void schedule::dispatch() {
 		}
 		break;
 
-		case SCENE_STATE_END:
+		case SCENE_STATE_END: {
+			n_Scene = sceneList[n_Scene]->getNextScene();
 
+			if (sceneList[n_Scene]->getState() == SCENE_STATE_SLEEP) 
+				sceneList[n_Scene]->setState(SCENE_STATE_RUN);
+		}
 		break;
 	}
 }

@@ -80,6 +80,7 @@ void utils::renderRectangle(const GLuint& texID, const color& r_Color) {
  */
 void utils::renderText(const std::string& text, const float& Xo, const float& Yo, const float& Zo, const FONT_TYPE& font,
    			     	   const color& r_Color) {
+	static glm::mat4 ui_ortho = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f);
 
 	std::string::const_iterator it;
 	std::vector<GLfloat> vbo_buffer;
@@ -89,9 +90,12 @@ void utils::renderText(const std::string& text, const float& Xo, const float& Yo
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, fontSet.tex->id);
 	glUniform4f(m_Color, r_Color.r, r_Color.g, r_Color.b, r_Color.a);
+	
+	m_Render->setProjectionMtx(ui_ortho);
 
 	float x = Xo;
 	float y = Yo;
+	unsigned int tCnt = 0;
 
 	for (it = text.begin(); it != text.end(); ++it) {
 		switch (font) {
@@ -128,6 +132,7 @@ void utils::renderText(const std::string& text, const float& Xo, const float& Yo
 
 					vbo_buffer.insert (vbo_buffer.end(), xyz_uv_coord, xyz_uv_coord+30);
 					x += 0.060f;
+					tCnt++;
 				}
 
 			}
@@ -166,6 +171,7 @@ void utils::renderText(const std::string& text, const float& Xo, const float& Yo
 
 					vbo_buffer.insert (vbo_buffer.end(), xyz_uv_coord, xyz_uv_coord+30);
 					x += 0.1f;
+					tCnt++;
 				}
 			}
 			break;
@@ -178,10 +184,11 @@ void utils::renderText(const std::string& text, const float& Xo, const float& Yo
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (void*)0x0);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (void*)0xC);
 
-	glDrawArrays(GL_TRIANGLES, 0, 6 * text.length());
+	glDrawArrays(GL_TRIANGLES, 0, 6 * tCnt);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);
+
 }
 
 /*

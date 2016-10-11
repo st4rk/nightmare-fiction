@@ -80,10 +80,11 @@ void mainMenu::stateMachine() {
 	 * initialize the startMenu struct
 	 */
 
-	 static _menu startMenu[TOTAL_ENTRY];
-	 startMenu[0] = {"NEW GAME", -0.25f, -0.5f, 0.0f};
-	 startMenu[1] = {"OPTIONS", -0.23f, -0.6f, 0.0f};
-	 startMenu[2] = {"EXIT", -0.15f, -0.7f, 0.0f};
+	 static _menu startMenu[] {
+	 	{"NEW GAME", -0.25f, -0.5f, 0.0f},
+	 	{"OPTIONS", -0.23f, -0.6f, 0.0f},
+		{"EXIT", -0.15f, -0.7f, 0.0f}
+	 };
 
 
 	switch (layers) {

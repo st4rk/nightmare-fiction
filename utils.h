@@ -13,6 +13,7 @@
 #include <cstring>
 #include <vector>
 
+#include "nf3d/nf3d.h"
 #include "render.h"
 
 enum FONT_TYPE {
@@ -69,6 +70,11 @@ public:
 	void renderText(const std::string& text, const float& Xo, const float& Yo, const float& Zo, const FONT_TYPE& font,
 				    const color& r_Color);
 
+	void render3D_Obj(const modelObj& obj);
+
+	void renderNF3D_anim(unsigned int objNum, unsigned int var, int var2, nf3d* obj);
+	void renderNF3D(nf3d* obj);
+
 	void setupFadeEffect(const float &speed, const float &r, const float& g, const float& b,const FADE_EFFECT_TYPE& type);
 	void doFadeEffect();
 
@@ -85,6 +91,8 @@ private:
 
 	fadeEffect fade;
 	modelObj fadeTexture;
+
+	glm::mat4 modelMtx;
 
 	FONT_TYPE font;
 };

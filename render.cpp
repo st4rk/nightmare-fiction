@@ -68,7 +68,7 @@ void render::swapBuffers() {
  */
 void render::clearScene() {
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
 }
 /*
  * initGL
@@ -124,7 +124,11 @@ bool render::initGL() {
 	// enable alpha
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
+		
+	// enable depth test
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+
 	// enable the two location used in code		
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
@@ -169,7 +173,7 @@ nTexture* render::loadTexture(const std::string& dir, bool remove, color rColor)
 		break;
 
 		case IMAGE_FORMAT_TIM:
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, nTex->texture.getWidth(), nTex->texture.getHeight(), 0, GL_BGR, GL_UNSIGNED_BYTE, nTex->texture.getTexture());
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, nTex->texture.getWidth() * 2, nTex->texture.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, nTex->texture.getTexture());
 		break;
 
 		default:

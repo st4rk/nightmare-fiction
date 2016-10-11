@@ -163,7 +163,6 @@ bool libstk::loadTIM(const std::string& dir) {
 
 	tim = fopen(dir.c_str(), "rb");
 
-
 	if (tim == NULL) {
 		std::cout << "failed while loading tim: " << dir << std::endl;
 		return false;
@@ -193,7 +192,7 @@ bool libstk::loadTIM(const std::string& dir) {
 		return false;
 	}
 
-	unsigned short numCluts = *(unsigned short*)(data+0x18);
+	unsigned short numCluts = *(unsigned short*)(data+18);
 
 	colorTable = new unsigned int*[numCluts];
 
@@ -203,7 +202,7 @@ bool libstk::loadTIM(const std::string& dir) {
 		colorTable[i] = new unsigned int [256];
 
 		for (unsigned int a = 0; a < 256; a++) {
-			colorByte = *(unsigned short*)(data + 20 + a * 2 + (512 * i));
+			colorByte = *(unsigned short*)(data+20+(a*sizeof(unsigned short))+ (512 * i));
 
 			unsigned char r = ((colorByte >> 10) & 0x1F);
 			unsigned char g = ((colorByte >> 5)  & 0x1F);
@@ -220,15 +219,18 @@ bool libstk::loadTIM(const std::string& dir) {
 	width  = *(unsigned short*)(data + offsetRel + 8);
 	height = *(unsigned short*)(data + offsetRel + 10);
 
-	texture = new unsigned char  [width * height * 6];
+	texture = new unsigned char  [height * (width * 2) * 3];
 
 	unsigned int offset = 0;
 	unsigned char yOffset = 0;
 	unsigned int color = 0;
 
-	for (unsigned short y = 0; y < height; y++) {
-		for (unsigned short x; x < (width * 2) ; x++) {
+
+	for (unsigned int y = 0; y < height; y++) {
+		for (unsigned int x = 0; x < (width * 2); x++) {
+
 			yOffset = *(unsigned char*)(data + offsetRel + 12 + x + (y * width * 2));
+
 
 			color = colorTable[x / 128][yOffset];
 
@@ -239,7 +241,6 @@ bool libstk::loadTIM(const std::string& dir) {
 			offset += 3;
 		}
 	}
-
 
 	for (unsigned int i = 0; i < numCluts; i++) {
 		delete [] colorTable[i];

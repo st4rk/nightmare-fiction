@@ -40,6 +40,7 @@ void utils::start(render *m_Render) {
 
 	glGenBuffers(1, &fontSet.vbo);
 	glGenBuffers(1, &utilsVBO);
+
 	glBindBuffer(GL_ARRAY_BUFFER, utilsVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_rectangle_data), vertex_rectangle_data, GL_STATIC_DRAW);
 
@@ -60,7 +61,6 @@ void utils::renderRectangle(const GLuint& texID, const color& r_Color) {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texID);
 
-
 	glBindBuffer(GL_ARRAY_BUFFER, utilsVBO);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	
@@ -73,6 +73,29 @@ void utils::renderRectangle(const GLuint& texID, const color& r_Color) {
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+
+/*
+ * TEST FUNCTION 
+ * This function render a 3D object, probably will be removed 
+ * no return
+ */
+void utils::render3D_Obj(const modelObj& obj) {
+	
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, obj.tex->id);
+
+	glBindBuffer(GL_ARRAY_BUFFER, obj.vbo);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	
+	glBindBuffer(GL_ARRAY_BUFFER, obj.t_vbo);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+	glDrawArrays(GL_TRIANGLES, 0, 3 * obj.t_Triangles);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 /*
  * renderText
  * This function is used to render bitmap fonts
@@ -80,9 +103,10 @@ void utils::renderRectangle(const GLuint& texID, const color& r_Color) {
  */
 void utils::renderText(const std::string& text, const float& Xo, const float& Yo, const float& Zo, const FONT_TYPE& font,
    			     	   const color& r_Color) {
+
+	static glm::mat4 pos = glm::mat4(1.0f);
 	static glm::mat4 ui_ortho = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f);
 
-	std::string::const_iterator it;
 	std::vector<GLfloat> vbo_buffer;
 
 	GLuint m_Color = glGetUniformLocation(m_Render->getProgramId(), "m_Color");
@@ -92,12 +116,14 @@ void utils::renderText(const std::string& text, const float& Xo, const float& Yo
 	glUniform4f(m_Color, r_Color.r, r_Color.g, r_Color.b, r_Color.a);
 	
 	m_Render->setProjectionMtx(ui_ortho);
+	m_Render->setViewMtx(glm::mat4(1.0f));
+	m_Render->setModelMtx(pos);
 
 	float x = Xo;
 	float y = Yo;
 	unsigned int tCnt = 0;
 
-	for (it = text.begin(); it != text.end(); ++it) {
+	for (auto it = text.begin(); it != text.end(); ++it) {
 		switch (font) {
 			case FONT_TYPE_SMALL: {
 
@@ -264,4 +290,71 @@ void utils::doFadeEffect() {
 
 }
 
+/*
+ * isInFade
+ * this function will return if the fade effect is running or no
+ * return bool
+ */
 bool utils::isInFade() const { return fade.inFade; }
+
+
+/*
+ * renderNF3D_anim
+ * when I written it I barely had idea about it, now only God knows.
+ * no return
+ */
+
+void utils::renderNF3D_anim(unsigned int objNum, unsigned int var, int var2, nf3d* obj) {
+
+    if (var == objNum) {
+        modelMtx = glm::translate(modelMtx, glm::vec3((float)obj->model->emdSec2RelPos[var2].x,
+													  (float)obj->model->emdSec2RelPos[var2].y,
+													  (float)obj->model->emdSec2RelPos[var2].z));
+
+        modelMtx = glm::rotate(modelMtx, glm::radians(obj->animFrame.vector[var2].x), glm::vec3(1.0f, 0.0f, 0.0f));
+        modelMtx = glm::rotate(modelMtx, glm::radians(obj->animFrame.vector[var2].y), glm::vec3(0.0f, 1.0f, 0.0f));
+        modelMtx = glm::rotate(modelMtx, glm::radians(obj->animFrame.vector[var2].z), glm::vec3(0.0f, 0.0f, 1.0f));
+     	
+        m_Render->setModelMtx(modelMtx);
+    }
+	
+    for (unsigned int c = 0; c < obj->model->emdSec2Armature[var].meshCount; c++) {
+        renderNF3D_anim(objNum, obj->model->emdSec2Mesh[var][c], var2, obj);
+    }
+}
+
+
+/*
+ * renderNF3D
+ * this function will render Resident Evil 1.5 and 2 EMD files
+ * no return
+ */
+void utils::renderNF3D(nf3d* obj) {
+	GLuint m_Color = glGetUniformLocation(m_Render->getProgramId(), "m_Color");
+	
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, obj->getTexId());
+	glUniform4f(m_Color, 1.0f, 1.0f, 1.0f, 1.0f);
+
+	glBindBuffer(GL_ARRAY_BUFFER, obj->getVBO());
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (void*)0x0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (void*)0xC);
+
+	for (unsigned int i = 0; i < obj->model->emdTotalObj; i++) {
+		modelMtx = glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, -500.0f, 100.0f));
+	    modelMtx = glm::rotate(modelMtx, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	    modelMtx = glm::rotate(modelMtx, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+		m_Render->setModelMtx(modelMtx);
+
+		for (unsigned int j = 0; j < obj->model->emdTotalObj; j++) {
+			renderNF3D_anim(i, j, j, obj);
+		}
+
+		glDrawArrays(GL_TRIANGLES, obj->vCnt[i].begin, obj->vCnt[i].total);
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}

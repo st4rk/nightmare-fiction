@@ -3,12 +3,12 @@
 
 #include "../../scene.h"
 
+#include "entity.h"
+
 enum MAIN_GAME_LAYERS {
 	MAIN_GAME_LAYER_INIT,
 	MAIN_GAME_LAYER_GAME
 };
-
-#define TOTAL_ENTRY 3
 
 class mainGame : public scene {
 public:
@@ -22,8 +22,12 @@ public:
 
 private:
 	void checkInput();
+	void logic();
 
+	entity m_Entity;
+	std::unique_ptr<nf3d> pModel;
 
+	MAIN_GAME_LAYERS layers;
 };
 
 

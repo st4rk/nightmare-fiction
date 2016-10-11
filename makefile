@@ -14,6 +14,7 @@ OBJECTS += $(patsubst %.cpp, %.o, $(wildcard shaders/*.cpp))
 OBJECTS += $(patsubst %.cpp, %.o, $(wildcard lib/*.cpp)) 
 OBJECTS += $(patsubst %.cpp, %.o, $(wildcard game/mainmenu/*.cpp)) 
 OBJECTS += $(patsubst %.cpp, %.o, $(wildcard game/vrmode/*.cpp)) 
+OBJECTS += $(patsubst %.cpp, %.o, $(wildcard nf3d/*.cpp))
 HEADERS = $(wildcard *.h) $(wildcard shaders/*.h) 
 
 %.o: %.cpp $(HEADERS)

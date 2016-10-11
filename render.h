@@ -46,6 +46,21 @@ public:
 	modelObj() {
 		tex = nullptr;
 		vbo = 0;
+		t_Triangles = 0;
+	}
+
+	void createVBO(const GLfloat *data, size_t size, unsigned int t_triangles) {
+		glGenBuffers(1, &vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+	}
+
+	// TODO: Remoe it, make a single VBO with 
+	// XYZ,UV
+	void createUV(const GLfloat *data, size_t size) {
+		glGenBuffers(1, &t_vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, t_vbo);
+		glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 	}
 
 	~modelObj() {
@@ -55,10 +70,14 @@ public:
 		}
 
 		glDeleteBuffers(1, &vbo);
+		glDeleteBuffers(1, &t_vbo);
 	}
+
+	unsigned int t_Triangles;
 
 	nTexture *tex;
 	GLuint vbo;
+	GLuint t_vbo;
 };
 
 class render {
@@ -93,7 +112,6 @@ private:
 	glm::mat4 p_Matrix; // projection matrix
 	glm::mat4 v_Matrix; // view matrix
 	glm::mat4 m_Matrix; // model matrix
-
 };
 
 

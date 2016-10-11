@@ -14,7 +14,6 @@ menuConfig::~menuConfig() {
 }
 
 void menuConfig::checkInput() {
-	// verify what input is pressed and verify if the state can change
 	if (m_Input->getPad() & CORE_PAD_UP) {
 		if (!pressed) {
 			if (arrow > 0) arrow--; 
@@ -56,10 +55,11 @@ void menuConfig::start() {
 void menuConfig::stateMachine() {
 
 
-	static _menu configMenu[TOTAL_ENTRY];
-	configMenu[0] = {"PLACEHOLDER1", -0.5f, -0.5f, 0.0f};
-	configMenu[1] = {"PLACEHOLDER2", -0.5f, -0.6f, 0.0f};
-	configMenu[2] = {"EXIT", -0.1f, -0.7f, 0.0f};
+	static _menu configMenu[] = {
+		{"PLACEHOLDER1", -0.5f, -0.5f, 0.0f},
+		{"PLACEHOLDER2", -0.5f, -0.6f, 0.0f},
+		{"EXIT", -0.1f, -0.7f, 0.0f}
+	};
 
 	switch (layers) {
 		case CONFIG_LAYER_INIT:

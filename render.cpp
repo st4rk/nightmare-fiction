@@ -11,7 +11,6 @@ render::~render() {
 	vaoID  = 0;
 }
 
-
 /*
  * setProjectionMtx
  * change projection matrix to a new one
@@ -43,6 +42,21 @@ void render::setModelMtx(const glm::mat4& m_Matrix) {
 }
 
 /*
+ * setShaderId
+ * set a new shader id
+ * update the textureUnit and MVP
+ * no return
+ */
+void render::setShaderId(const GLuint& currentShader) {
+	this->currentShader = currentShader;
+	glUseProgram(currentShader);
+	// get texture unit 
+	texUnit = glGetUniformLocation(currentShader, "texUnit");
+	// MODEL VIEW PROJECTION matrix shader
+	mvpID = glGetUniformLocation(currentShader, "MVP");
+}
+
+/*
  * PRIVATE FUNCTION
  * updateMVP
  * update model, view, projection matrix 
@@ -68,7 +82,7 @@ void render::swapBuffers() {
  */
 void render::clearScene() {
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 }
 /*
  * initGL
@@ -88,7 +102,7 @@ bool render::initGL() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, GL_CTX_MAJOR_VERSION);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, GL_CTX_MINOR_VERSION); // using OpenGL 3.3
 
-	window = glfwCreateWindow(RENDER_RES_WIDTH, RENDER_RES_HEIGHT, "NF Framework - 0.03a", NULL, NULL);
+	window = glfwCreateWindow(RENDER_RES_WIDTH, RENDER_RES_HEIGHT, "NF Framework - 0.05a", NULL, NULL);
 
 	if (window == NULL) {
 		std::cout << "Error while creating a window, verify if your GPU support GL Version: " <<
@@ -109,29 +123,17 @@ bool render::initGL() {
 	glGenVertexArrays(1, &vaoID);
 	glBindVertexArray(vaoID);
 
-	// load shader
-	programID = LoadShaders( "shaders/vertexShader.glsl", "shaders/fragmentShader.glsl" );
-
-	// get texture unit 
-	texUnit = glGetUniformLocation(programID, "myTextureSampler");
-
-	// MODEL VIEW PROJECTION matrix shader
-	mvpID = glGetUniformLocation(programID, "MVP");
-	
-	// using the standard shader
-	glUseProgram(programID);
-
 	// enable alpha
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		
 	// enable depth test
 	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
 
-	// enable the two location used in code		
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
+	// enable the three location used in code		
+	glEnableVertexAttribArray(0); // XYZ
+	glEnableVertexAttribArray(1); // UV
+	glEnableVertexAttribArray(2); // Normal
 	
 	return true;
 }
@@ -191,10 +193,10 @@ nTexture* render::loadTexture(const std::string& dir, bool remove, color rColor)
  * getTexUnit
  * return texture unit
  */
-GLuint render::getTexUnit() const { return texUnit; }
+const GLuint& render::getTexUnit() const { return texUnit; }
 
 /*
- * getProgramId
+ * getCurrentShader
  * return current program id
  */
-GLuint render::getProgramId() const { return programID; }
+const GLuint& render::getCurrentShader() const { return currentShader; }

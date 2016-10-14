@@ -23,7 +23,7 @@
 enum RENDER_INFORMATION {
 	RENDER_RES_WIDTH   = 640,
 	RENDER_RES_HEIGHT  = 480,
-	RENDER_SAMPLES = 1
+	RENDER_SAMPLES = 0
 };
 
 enum GL_INFORMATION {
@@ -92,19 +92,20 @@ public:
 	void setProjectionMtx(const glm::mat4& p_Matrix);
 	void setViewMtx(const glm::mat4& v_Matrix);
 	void setModelMtx(const glm::mat4& m_Matrix);
+	void setShaderId(const GLuint& currentShader);
 
 	GLFWwindow* getContext();
 
 	nTexture* loadTexture(const std::string& dir, bool remove = false, color rColor = {1.0f, 1.0f, 1.0f, 1.0f});
 
-	GLuint getTexUnit() const;
-	GLuint getProgramId() const;
+	const GLuint& getTexUnit() const;
+	const GLuint& getCurrentShader() const;
 
 private:
 	void updateMVP();
 
 	GLFWwindow *window;
-	GLuint programID;
+	GLuint currentShader;
 	GLuint texUnit;
 	GLuint mvpID;
 	GLuint vaoID;

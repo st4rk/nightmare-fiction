@@ -6,7 +6,7 @@ schedule::schedule() {
 	m_Utils  = nullptr;
 	m_Input  = nullptr;
 
-	n_Scene = GAME_SCENE_VR_MODE;
+	n_Scene = GAME_SCENE_MAIN_MENU;
 }
 
 schedule::~schedule() {

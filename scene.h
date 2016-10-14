@@ -18,6 +18,42 @@ struct _menu {
 	float x;
 	float y;
 	float z;
+
+	unsigned int cnt;
+	bool anim;
+	float tick;
+	float tmr;
+
+	std::string tmrText;
+	
+	void checkTmr() {
+		if (anim) {
+			if (tick < glfwGetTime()) {
+				tick = glfwGetTime() + tmr;
+
+				if(cnt >= text.size())
+					anim = false;
+				else
+					tmrText.push_back(text[cnt++]);
+			}
+		}
+	}
+
+};
+
+struct timer {
+	float tick;
+	float tmr;
+	bool enable;
+
+	void run() {
+		if (tick < glfwGetTime()) {
+			tick = glfwGetTime() + tmr;
+			enable = true;
+		} else {
+			enable = false;
+		}
+	}
 };
 
 class scene {

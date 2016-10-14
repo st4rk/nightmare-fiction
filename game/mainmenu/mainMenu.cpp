@@ -23,6 +23,10 @@ mainMenu::~mainMenu() {
 void mainMenu::start() {
 	nTexture* node = nullptr;
 
+	GLuint currentShader = LoadShaders("game/shaders/vertexShader.glsl", "game/shaders/fragmentShader.glsl");
+
+	m_Render->setShaderId(currentShader);
+
 	node = m_Render->loadTexture("resource/ui/intro_1.bmp");
 	textureList.push_back(node);
 	node = m_Render->loadTexture("resource/ui/intro_2.bmp");

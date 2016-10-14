@@ -30,44 +30,42 @@ nf3d::nf3d(const std::string& dir, nTexture* tex) {
 			objectBuffer.push_back(static_cast<GLfloat>(model->emdVertex[i][model->emdTriangle[i][j].v0].x));
 			objectBuffer.push_back(static_cast<GLfloat>(model->emdVertex[i][model->emdTriangle[i][j].v0].y));
 			objectBuffer.push_back(static_cast<GLfloat>(model->emdVertex[i][model->emdTriangle[i][j].v0].z));
-			/* normal to xyz */
-			//objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdTriangle[i][j].n0].x));
-			//objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdTriangle[i][j].n0].y));
-			//objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdTriangle[i][j].n0].z));
 			/* uv */
 			objectBuffer.push_back(static_cast<GLfloat>((model->emdTritexture[i][j].u0 + uPage) / width_t));
 			objectBuffer.push_back(static_cast<GLfloat>((model->emdTritexture[i][j].v0) / height_t));
+			/* normal to xyz */
+			objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdTriangle[i][j].n0].x));
+			objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdTriangle[i][j].n0].y));
+			objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdTriangle[i][j].n0].z));
 			/* vertex 1 */
 			/* xyz */
 			objectBuffer.push_back(static_cast<GLfloat>(model->emdVertex[i][model->emdTriangle[i][j].v1].x));
 			objectBuffer.push_back(static_cast<GLfloat>(model->emdVertex[i][model->emdTriangle[i][j].v1].y));
 			objectBuffer.push_back(static_cast<GLfloat>(model->emdVertex[i][model->emdTriangle[i][j].v1].z));
-			/* normal to xyz */
-			//objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdTriangle[i][j].n1].x));
-			//objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdTriangle[i][j].n1].y));
-			//objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdTriangle[i][j].n1].z));
 			/* uv */
 			objectBuffer.push_back(static_cast<GLfloat>((model->emdTritexture[i][j].u1 + uPage) / width_t));
 			objectBuffer.push_back(static_cast<GLfloat>((model->emdTritexture[i][j].v1) / height_t));
-			/* vertex 1 */
+			/* normal to xyz */
+			objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdTriangle[i][j].n1].x));
+			objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdTriangle[i][j].n1].y));
+			objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdTriangle[i][j].n1].z));
 			/* xyz */
 			objectBuffer.push_back(static_cast<GLfloat>(model->emdVertex[i][model->emdTriangle[i][j].v2].x));
 			objectBuffer.push_back(static_cast<GLfloat>(model->emdVertex[i][model->emdTriangle[i][j].v2].y));
 			objectBuffer.push_back(static_cast<GLfloat>(model->emdVertex[i][model->emdTriangle[i][j].v2].z));
-			/* normal to xyz */
-			//objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdTriangle[i][j].n2].x));
-			//objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdTriangle[i][j].n2].y));
-			//objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdTriangle[i][j].n2].z));
 			/* uv */
 			objectBuffer.push_back(static_cast<GLfloat>((model->emdTritexture[i][j].u2 + uPage) / width_t));
 			objectBuffer.push_back(static_cast<GLfloat>((model->emdTritexture[i][j].v2) / height_t));
+			/* normal to xyz */
+			objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdTriangle[i][j].n2].x));
+			objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdTriangle[i][j].n2].y));
+			objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdTriangle[i][j].n2].z));
 
-			node.total++;
+			node.total += 3;
 		}
 
 		
 		for (unsigned int j = 0; j < model->emdObjectBuffer[i].quads.quadCount; j++) {
-
 			uPage = ((model->emdQuadTexture[i][j].page & 0b00111111) * 128);
 
 			/* TRIANGLE 1 */
@@ -75,79 +73,87 @@ nf3d::nf3d(const std::string& dir, nTexture* tex) {
 			objectBuffer.push_back(static_cast<GLfloat>(model->emdquadVertex[i][model->emdQuad[i][j].v0].y));
 			objectBuffer.push_back(static_cast<GLfloat>(model->emdquadVertex[i][model->emdQuad[i][j].v0].z));
 
-			//objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n0].x));
-			//objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n0].y));
-			//objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n0].z));
-
 			objectBuffer.push_back(static_cast<GLfloat>((model->emdQuadTexture[i][j].u0 + uPage) / width_t));
 			objectBuffer.push_back(static_cast<GLfloat>((model->emdQuadTexture[i][j].v0) / height_t));
+
+			objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n0].x));
+			objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n0].y));
+			objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n0].z));
+
 
 			objectBuffer.push_back(static_cast<GLfloat>(model->emdquadVertex[i][model->emdQuad[i][j].v1].x));
 			objectBuffer.push_back(static_cast<GLfloat>(model->emdquadVertex[i][model->emdQuad[i][j].v1].y));
 			objectBuffer.push_back(static_cast<GLfloat>(model->emdquadVertex[i][model->emdQuad[i][j].v1].z));
-
-			//objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n1].x));
-			//objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n1].y));
-			//objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n1].z));
  
 			objectBuffer.push_back(static_cast<GLfloat>((model->emdQuadTexture[i][j].u1 + uPage) / width_t));
 			objectBuffer.push_back(static_cast<GLfloat>((model->emdQuadTexture[i][j].v1) / height_t));;
+
+			objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n1].x));
+			objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n1].y));
+			objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n1].z));
+
 
 			objectBuffer.push_back(static_cast<GLfloat>(model->emdquadVertex[i][model->emdQuad[i][j].v2].x));
 			objectBuffer.push_back(static_cast<GLfloat>(model->emdquadVertex[i][model->emdQuad[i][j].v2].y));
 			objectBuffer.push_back(static_cast<GLfloat>(model->emdquadVertex[i][model->emdQuad[i][j].v2].z));
 
-			//objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n2].x));
-			//objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n2].y));
-			//objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n2].z));
-
 			objectBuffer.push_back(static_cast<GLfloat>((model->emdQuadTexture[i][j].u2 + uPage) / width_t));
 			objectBuffer.push_back(static_cast<GLfloat>((model->emdQuadTexture[i][j].v2) / height_t));
+
+			objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n2].x));
+			objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n2].y));
+			objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n2].z));
+
 
 			/* TRIANGLE 2 */
 			objectBuffer.push_back(static_cast<GLfloat>(model->emdquadVertex[i][model->emdQuad[i][j].v1].x));
 			objectBuffer.push_back(static_cast<GLfloat>(model->emdquadVertex[i][model->emdQuad[i][j].v1].y));
 			objectBuffer.push_back(static_cast<GLfloat>(model->emdquadVertex[i][model->emdQuad[i][j].v1].z));
-
-			//objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n1].x));
-			//objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n1].y));
-			//objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n1].z));
  
 			objectBuffer.push_back(static_cast<GLfloat>((model->emdQuadTexture[i][j].u1 + uPage) / width_t));
 			objectBuffer.push_back(static_cast<GLfloat>((model->emdQuadTexture[i][j].v1) / height_t));;
+
+			objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n1].x));
+			objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n1].y));
+			objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n1].z));
+
 
 			objectBuffer.push_back(static_cast<GLfloat>(model->emdquadVertex[i][model->emdQuad[i][j].v2].x));
 			objectBuffer.push_back(static_cast<GLfloat>(model->emdquadVertex[i][model->emdQuad[i][j].v2].y));
 			objectBuffer.push_back(static_cast<GLfloat>(model->emdquadVertex[i][model->emdQuad[i][j].v2].z));
 
-			//objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n2].x));
-			//objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n2].y));
-			//objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n2].z));
-
 			objectBuffer.push_back(static_cast<GLfloat>((model->emdQuadTexture[i][j].u2 + uPage) / width_t));
 			objectBuffer.push_back(static_cast<GLfloat>((model->emdQuadTexture[i][j].v2) / height_t));
+
+			objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n2].x));
+			objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n2].y));
+			objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n2].z));
+
 
 			objectBuffer.push_back(static_cast<GLfloat>(model->emdquadVertex[i][model->emdQuad[i][j].v3].x));
 			objectBuffer.push_back(static_cast<GLfloat>(model->emdquadVertex[i][model->emdQuad[i][j].v3].y));
 			objectBuffer.push_back(static_cast<GLfloat>(model->emdquadVertex[i][model->emdQuad[i][j].v3].z));
 
-			//objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n2].x));
-			//objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n2].y));
-			//objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n2].z));
-
 			objectBuffer.push_back(static_cast<GLfloat>((model->emdQuadTexture[i][j].u3 + uPage) / width_t));
 			objectBuffer.push_back(static_cast<GLfloat>((model->emdQuadTexture[i][j].v3) / height_t));
 
-			node.total += 2;
+			objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n2].x));
+			objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n2].y));
+			objectBuffer.push_back(static_cast<GLfloat>(model->emdNormal[i][model->emdQuad[i][j].n2].z));
+
+
+			node.total += 6;
 		} 
 	
-		node.total *= 3;
 		vCnt.push_back(node);
 	}
 	glBufferData(GL_ARRAY_BUFFER, objectBuffer.size() * sizeof(GLfloat), &objectBuffer[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	animCnt = 0;
+
+	isInterpolation = false;
+	interpolationValue = 0.0f;
 }
 
 
@@ -166,10 +172,26 @@ void nf3d::setAnimSection(const EMD_SECTION_LIST& emdSection) {
 }
 
 void nf3d::setSec2Animation(const STANDARD_SEC2_ANIMATION& emdSec2Animation) {
+
+	/* check if is necessary do interpolation */
+	if (this->emdSec2Animation != emdSec2Animation) {
+		this->oldEmdSec2Animation = this->emdSec2Animation;
+		oldFrame = animFrame;
+		isInterpolation = true;
+	}
+
+
 	this->emdSec2Animation = emdSec2Animation;
 }
 
 void nf3d::setSec4Animation(const STANDARD_SEC4_ANIMATION& emdSec4Animation) {
+
+	if (this->emdSec4Animation != emdSec4Animation) {
+		this->oldEmdSec4Animation = this->emdSec4Animation;
+		interpolationValue = 0.0f;
+		isInterpolation = true;
+	}
+
 	this->emdSec4Animation = emdSec4Animation;
 }
 
@@ -192,13 +214,45 @@ void nf3d::runAnimation() {
 		break;
 
 		case EMD_SECTION_4:{
-			if (animCnt < model->emdSec4AnimInfo[emdSec4Animation].animCount - 1) {
-				animCnt++;
+
+			/* fail try to interpolation */
+			if (isInterpolation) {
+				if (animCnt < model->emdSec4AnimInfo[emdSec4Animation].animCount - 1) {
+					animCnt++;
+				} else {
+					animCnt = 0;
+				}
+				
+				animFrame = model->emdSec4Data[animCnt + model->emdSec4AnimInfo[emdSec4Animation].animStart];
+
+				for (unsigned int i = 0; i < oldFrame.vector.size(); i++) {
+					/* check the limit */
+					if (i > animFrame.vector.size())
+						break;
+
+
+					animFrame.vector[i].x = glm::mix(animFrame.vector[i].x, oldFrame.vector[i].x, interpolationValue);
+					animFrame.vector[i].y = glm::mix(animFrame.vector[i].y, oldFrame.vector[i].y, interpolationValue);
+					animFrame.vector[i].z = glm::mix(animFrame.vector[i].z, oldFrame.vector[i].z, interpolationValue);
+
+
+				}
+
+				if (interpolationValue > 1.0f) {
+					interpolationValue = 0.0f;
+					isInterpolation = false;
+				}
+
+
 			} else {
-				animCnt = 0;
+				if (animCnt < model->emdSec4AnimInfo[emdSec4Animation].animCount - 1) {
+					animCnt++;
+				} else {
+					animCnt = 0;
+				}
+				
+				animFrame = model->emdSec4Data[animCnt + model->emdSec4AnimInfo[emdSec4Animation].animStart];
 			}
-			
-			animFrame = model->emdSec4Data[animCnt + model->emdSec4AnimInfo[emdSec4Animation].animStart];
 		}
 		break;
 	}

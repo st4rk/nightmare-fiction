@@ -55,7 +55,8 @@ void utils::start(render *m_Render) {
  * no return
  */
 void utils::renderRectangle(const GLuint& texID, const color& r_Color) {
-	GLuint m_Color = glGetUniformLocation(m_Render->getProgramId(), "m_Color");
+	glDisable(GL_DEPTH_TEST);
+	GLuint m_Color = glGetUniformLocation(m_Render->getCurrentShader(), "m_Color");
 	
 	glUniform4f(m_Color, r_Color.r, r_Color.g, r_Color.b, r_Color.a);
 	glActiveTexture(GL_TEXTURE0);
@@ -71,6 +72,8 @@ void utils::renderRectangle(const GLuint& texID, const color& r_Color) {
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glEnable(GL_DEPTH_TEST);
 }
 
 
@@ -103,13 +106,13 @@ void utils::render3D_Obj(const modelObj& obj) {
  */
 void utils::renderText(const std::string& text, const float& Xo, const float& Yo, const float& Zo, const FONT_TYPE& font,
    			     	   const color& r_Color) {
-
+	glDisable(GL_DEPTH_TEST);
 	static glm::mat4 pos = glm::mat4(1.0f);
 	static glm::mat4 ui_ortho = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f);
 
 	std::vector<GLfloat> vbo_buffer;
 
-	GLuint m_Color = glGetUniformLocation(m_Render->getProgramId(), "m_Color");
+	GLuint m_Color = glGetUniformLocation(m_Render->getCurrentShader(), "m_Color");
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, fontSet.tex->id);
@@ -214,7 +217,7 @@ void utils::renderText(const std::string& text, const float& Xo, const float& Yo
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);
-
+	glEnable(GL_DEPTH_TEST);
 }
 
 /*
@@ -329,8 +332,8 @@ void utils::renderNF3D_anim(unsigned int objNum, unsigned int var, int var2, nf3
  * this function will render Resident Evil 1.5 and 2 EMD files
  * no return
  */
-void utils::renderNF3D(nf3d* obj) {
-	GLuint m_Color = glGetUniformLocation(m_Render->getProgramId(), "m_Color");
+void utils::renderNF3D(const glm::vec3& pos, const float& angle, nf3d* obj) {
+	GLuint m_Color = glGetUniformLocation(m_Render->getCurrentShader(), "m_Color");
 	
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, obj->getTexId());
@@ -338,13 +341,13 @@ void utils::renderNF3D(nf3d* obj) {
 
 	glBindBuffer(GL_ARRAY_BUFFER, obj->getVBO());
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (void*)0x0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (void*)0xC);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)0x0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)0xC);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)0x14);
 
 	for (unsigned int i = 0; i < obj->model->emdTotalObj; i++) {
-		modelMtx = glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, -500.0f, 100.0f));
-	    modelMtx = glm::rotate(modelMtx, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	    modelMtx = glm::rotate(modelMtx, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		modelMtx = glm::translate(glm::mat4(1.0f), pos);
+	    modelMtx = glm::rotate(modelMtx, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
 
 		m_Render->setModelMtx(modelMtx);
 

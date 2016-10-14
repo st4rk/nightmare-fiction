@@ -142,7 +142,20 @@ bool libstk::loadPNG(const std::string& dir) {
 
 	texture = new unsigned char[raw.size()];
 
-	std::memcpy(texture, &raw[0], raw.size());
+	unsigned int stride = width * 4;
+
+	for (unsigned int y = 0; y < height; y++) {
+	  for (unsigned int x = 0; x < width; x++) {
+	    
+	    unsigned int old_pos = ((height - y - 1) * stride + x * 4);
+	    unsigned int new_pos = (y * stride + x * 4);
+	    
+	    texture[new_pos + 0] = raw[old_pos + 0];
+	    texture[new_pos + 1] = raw[old_pos + 1];
+	    texture[new_pos + 2] = raw[old_pos + 2];
+	    texture[new_pos + 3] = raw[old_pos + 3];
+	  }
+	}
 
 	format = IMAGE_FORMAT_PNG;
 	return true;

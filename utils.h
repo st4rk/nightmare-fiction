@@ -73,7 +73,7 @@ public:
 	void render3D_Obj(const modelObj& obj);
 
 	void renderNF3D_anim(unsigned int objNum, unsigned int var, int var2, nf3d* obj);
-	void renderNF3D(nf3d* obj);
+	void renderNF3D(const glm::vec3& pos, const float& angle, nf3d* obj);
 
 	void setupFadeEffect(const float &speed, const float &r, const float& g, const float& b,const FADE_EFFECT_TYPE& type);
 	void doFadeEffect();

@@ -3,6 +3,7 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <glm/gtc/quaternion.hpp>
 #include <memory>
 #include "emd.h"
 #include "../render.h"
@@ -39,10 +40,22 @@ public:
 private:
 	nTexture* tex;
 	GLuint vbo;
+	
+	bool isInterpolation;
+
+	float interpolationValue;
+
+	EMD_SEC2_DATA_T oldFrame;
+
 	EMD_SECTION_LIST emdSection;
+	EMD_SECTION_LIST oldEmdSection;
 
 	STANDARD_SEC2_ANIMATION emdSec2Animation;
 	STANDARD_SEC4_ANIMATION emdSec4Animation;
+
+	STANDARD_SEC2_ANIMATION oldEmdSec2Animation;
+	STANDARD_SEC4_ANIMATION oldEmdSec4Animation;
+
 
 	unsigned int animCnt;
 };

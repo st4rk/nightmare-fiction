@@ -35,8 +35,8 @@ void utils::start(render *m_Render) {
 	 * load font set
 	 */
 
-	fontSet.tex = m_Render->loadTexture("resource/font/1.BMP", true, {0.0f, 0.0f, 0.0f, 0.0f});
-	fadeTexture.tex = m_Render->loadTexture("resource/ui/dummy.png");
+	fontSet.tex.reset(m_Render->loadTexture("resource/font/1.BMP", true, {0.0f, 0.0f, 0.0f, 0.0f}));
+	fadeTexture.tex.reset(m_Render->loadTexture("resource/ui/dummy.png"));
 
 	glGenBuffers(1, &fontSet.vbo);
 	glGenBuffers(1, &utilsVBO);
@@ -77,21 +77,21 @@ void utils::renderRectangle(const GLuint& texID, const color& r_Color) {
 }
 
 
-/*
- * TEST FUNCTION 
- * This function render a 3D object, probably will be removed 
- * no return
+/**
+ * render3D_obj
+ * render a static object
+ * returns nothing
  */
 void utils::render3D_Obj(const modelObj& obj) {
+	GLuint m_Color = glGetUniformLocation(m_Render->getCurrentShader(), "m_Color");
+	glUniform4f(m_Color, 1.0f, 1.0f, 1.0f, 1.0f);
 	
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, obj.tex->id);
 
 	glBindBuffer(GL_ARRAY_BUFFER, obj.vbo);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, obj.t_vbo);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (void*)0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (void*)0xC);
 
 	glDrawArrays(GL_TRIANGLES, 0, 3 * obj.t_Triangles);
 
@@ -106,6 +106,7 @@ void utils::render3D_Obj(const modelObj& obj) {
  */
 void utils::renderText(const std::string& text, const float& Xo, const float& Yo, const float& Zo, const FONT_TYPE& font,
    			     	   const color& r_Color) {
+	
 	glDisable(GL_DEPTH_TEST);
 	static glm::mat4 pos = glm::mat4(1.0f);
 	static glm::mat4 ui_ortho = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f);
@@ -310,9 +311,9 @@ bool utils::isInFade() const { return fade.inFade; }
 void utils::renderNF3D_anim(unsigned int objNum, unsigned int var, int var2, nf3d* obj) {
 
     if (var == objNum) {
-        modelMtx = glm::translate(modelMtx, glm::vec3((float)obj->model->emdSec2RelPos[var2].x,
-													  (float)obj->model->emdSec2RelPos[var2].y,
-													  (float)obj->model->emdSec2RelPos[var2].z));
+        modelMtx = glm::translate(modelMtx, glm::vec3(obj->model->emdSec2RelPos[var2].x,
+													  obj->model->emdSec2RelPos[var2].y,
+													  obj->model->emdSec2RelPos[var2].z));
 
         modelMtx = glm::rotate(modelMtx, glm::radians(obj->animFrame.vector[var2].x), glm::vec3(1.0f, 0.0f, 0.0f));
         modelMtx = glm::rotate(modelMtx, glm::radians(obj->animFrame.vector[var2].y), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -350,7 +351,7 @@ void utils::renderNF3D(const glm::vec3& pos, const float& angle, nf3d* obj) {
 	    modelMtx = glm::rotate(modelMtx, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
 
 		m_Render->setModelMtx(modelMtx);
-
+		
 		for (unsigned int j = 0; j < obj->model->emdTotalObj; j++) {
 			renderNF3D_anim(i, j, j, obj);
 		}

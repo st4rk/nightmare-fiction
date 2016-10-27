@@ -3,10 +3,10 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <glm/gtc/quaternion.hpp>
 #include <memory>
 #include "emd.h"
 #include "../render.h"
+#include "../physics.h"
 
 struct vertexCnt {
 	unsigned int begin;
@@ -26,7 +26,7 @@ public:
 	const STANDARD_SEC4_ANIMATION& getSec4Animation();
 	const unsigned int& getAnimCnt();
 
-	void runAnimation();
+	void run();
 
 	void setAnimSection(const EMD_SECTION_LIST& emdSection);
 	void setSec2Animation(const STANDARD_SEC2_ANIMATION& emdSec2Animation);
@@ -43,18 +43,13 @@ private:
 	
 	bool isInterpolation;
 
-	float interpolationValue;
-
+	float interTotal;
+	float interStep;
 	EMD_SEC2_DATA_T oldFrame;
 
 	EMD_SECTION_LIST emdSection;
-	EMD_SECTION_LIST oldEmdSection;
-
 	STANDARD_SEC2_ANIMATION emdSec2Animation;
 	STANDARD_SEC4_ANIMATION emdSec4Animation;
-
-	STANDARD_SEC2_ANIMATION oldEmdSec2Animation;
-	STANDARD_SEC4_ANIMATION oldEmdSec4Animation;
 
 
 	unsigned int animCnt;

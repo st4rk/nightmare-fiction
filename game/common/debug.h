@@ -7,10 +7,55 @@
 #include <cstring>
 
 
+#define DEBUG_TYPE_BH2_BETA2 0
+#define DEBUG_TYPE_BH2_PROTO 1
+
 struct RE2_JUMP_ENTRY {
 	float x;
 	float z;
 	std::string roomName;
+};
+
+static RE2_JUMP_ENTRY bh2_proto[] = {
+	{-16221.0f, -22346.0f, "              "},
+	{-16221.0f, -22346.0f, "              "},
+	{-26000.0f, -8700.0f, "OFFICE B      "},
+	{-8200.0f, -22500.0f, "LOBBY         "},
+	{-22000.0f, -3200.0f, "LOBBY ROUKA   "},
+	{-16221.0f, -22346.0f, "              "},
+	{-26378.0f, -25630.0f, "KAIDAN 1      "},
+	{850.0f, 3600.0f, "OFFICE A      "},
+	{-16221.0f, -22346.0f, "              "},
+	{-10200.0f, 1400.0f, "SOTO B        "},
+	{-16221.0f, -22346.0f, "KAIDAN 2     -"},
+	{17164.0f, -7892.0f, "SOTO A        "},
+	{-16221.0f, -22346.0f, "              "},
+	{-16221.0f, -22346.0f, "              "},
+	{-16221.0f, -22346.0f, "              "},
+	{-16221.0f, -22346.0f, "              "},
+	{-18000.0f, -25000.0f, "SIRYOUSITU MAE"},
+	{-16221.0f, -22346.0f, "              "},
+	{-16221.0f, -22346.0f, "              "},
+	{-16221.0f, -22346.0f, "              "},
+	{-16221.0f, -22346.0f, "              "},
+	{-17370.0f, -11900.0f, "SHOCHO ROOM   "},
+	{-26000.0f, -19220.0f, "HELI PORT MAE "},
+	{3940.0f, 14167.0f, "OKUJYOU       "},
+	{-21889.0f, -25508.0f, "B1 ROUKA      "},
+	{3050.0f, -11650.0f, "SHOOTING RANGE"},
+	{-22487.0f, -16764.0f, "BUKI  SOUKO   "},
+	{-26130.0f, -18455.0f, "CHIKA CYUU B  "},
+	{-22604.0f, 14455.0f, "CHIKA CYUU A  "},
+	{-16221.0f, -22346.0f, "              "},
+	{10000.0f, 10000.0f, "B2 ROUKA      "},
+	{-24901.0f, -8038.0f, "BOIRA SHITSU  "},
+	{-19894.0f, -25139.0f, "SHITAI OKIBA  "},
+	{-26420.0f, -2400.0f, "RYUUCHI SYO   "},
+	{-22176.0f, -6664.0f, "DOKUBOU 1     "},
+	{-16596.0f, -9870.0f, "DOKUBOU 2     "},
+	{-22202.0f, -14073.0f, "DOKUBOU 3     "},
+	{-17012.0f, -17784.0f, "DOKUBOU 4     "},
+	{-16796.0f, -25105.0f, "DOKUBOU 5     "},
 };
 
 static RE2_JUMP_ENTRY bh2_beta2[] = {
@@ -52,13 +97,14 @@ struct debug {
 	_menu menu[2];
      
 	unsigned int currMap;
+	unsigned int type;
 
 	void nextMap() {
 		char jump_name[0xFF];
 		if (currMap < 29) {
 			currMap++;
 			memset(jump_name, 0, 0xFF);
-			sprintf(jump_name, "JUMP %d%02X %s", 1, currMap, bh2_beta2[currMap].roomName.c_str());
+			sprintf(jump_name, "JUMP %d%02X %s", 1, currMap, bh2_proto[currMap].roomName.c_str());
 			menu[1].text = jump_name;
 		}
 	}
@@ -68,25 +114,25 @@ struct debug {
 		if (currMap > 0) {
 			currMap--;
 			memset(jump_name, 0, 0xFF);
-			sprintf(jump_name, "JUMP %d%02X %s", 1, currMap, bh2_beta2[currMap].roomName.c_str());
+			sprintf(jump_name, "JUMP %d%02X %s", 1, currMap, bh2_proto[currMap].roomName.c_str());
 			menu[1].text = jump_name;
 		}
 	}
 
 	void update(const unsigned int& map) {
 		menu[0] = {"- DEBUG MENU - ", -0.40f, 0.10f, 0.0f, 0, false};
-		menu[1] = {"JUMP", -0.50f, -0.05f, 0.0f, 0, false};
+		menu[1] = {"JUMP", -0.60f, -0.05f, 0.0f, 0, false};
 		
 		currMap = map;
 
 		char jump_name[0xFF];
 		memset(jump_name, 0, 0xFF);
-		sprintf(jump_name, "JUMP %d%02X %s", 1, currMap, bh2_beta2[currMap].roomName.c_str());
+		sprintf(jump_name, "JUMP %d%02X %s", 1, currMap, bh2_proto[currMap].roomName.c_str());
 		menu[1].text = jump_name;
 	}
 
-	const float& getMapX() { return bh2_beta2[currMap].x; }
-	const float& getMapZ() { return bh2_beta2[currMap].z; }
+	const float& getMapX() { return bh2_proto[currMap].x; }
+	const float& getMapZ() { return bh2_proto[currMap].z; }
 
 };
 

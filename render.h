@@ -11,6 +11,7 @@
 #define _RENDER_H_
 
 #include <iostream>
+#include <memory>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -44,40 +45,25 @@ struct nTexture {
 class modelObj {
 public:
 	modelObj() {
-		tex = nullptr;
 		vbo = 0;
 		t_Triangles = 0;
 	}
 
-	void createVBO(const GLfloat *data, size_t size, unsigned int t_triangles) {
+	void createVBO(const GLfloat *data, size_t size, unsigned int t_Triangles) {
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
-	}
-
-	// TODO: Remoe it, make a single VBO with 
-	// XYZ,UV
-	void createUV(const GLfloat *data, size_t size) {
-		glGenBuffers(1, &t_vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, t_vbo);
-		glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+		this->t_Triangles = t_Triangles;
 	}
 
 	~modelObj() {
-		if (tex != nullptr) {
-			delete tex;
-			tex = nullptr;
-		}
-
 		glDeleteBuffers(1, &vbo);
-		glDeleteBuffers(1, &t_vbo);
 	}
 
 	unsigned int t_Triangles;
 
-	nTexture *tex;
+	std::unique_ptr<nTexture> tex;
 	GLuint vbo;
-	GLuint t_vbo;
 };
 
 class render {

@@ -11,46 +11,55 @@ mainGame::~mainGame() {
 	currState = 0;
 }
 
-void mainGame::loadRoom() {
-	/* Load RDT File */
-	char fileName[0xFF];
-	memset (fileName, 0, 0xFF);
-	sprintf(fileName, "resource/stages/RDT/ROOM%d%02X0.RDT", m_Player.getStage(), m_Player.getMap());
-	pRDT.reset(new RDT(fileName, RDT_TYPE_RE2));
-
-	/* Load Backgrounds */
-	pRDT_tex.clear();
-	nTexture* tex = nullptr;
-
-	for (unsigned int i = 0; i < pRDT->rdtHeader.nCut; i++) {
-		memset (fileName, 0, 0xFF);
-		sprintf(fileName, "resource/stages/PAK/ROOM%d%02X/%d.PNG", m_Player.getStage(), m_Player.getMap(), i);
-
-		tex = m_Render->loadTexture(fileName);
-
-		pRDT_tex.push_back(tex);	
-	}
-
-}
-
 void mainGame::start() {
+	static GLfloat shadow_xyzuv[] = {
+	   -960.0f,  -10.0f, -960.0f,
+		0.0f, 0.0f,
+
+	    960.0f,  -10.0f, -960.0f,
+		1.0f, 0.0f,
+
+	   -960.0f,  -10.0f,  960.0f,
+		0.0f, 1.0f,
+
+	    960.0f,  -10.0f,  960.0f,
+		1.0f, 1.0f,
+
+	   -960.0f,  -10.0f,  960.0f,
+		0.0f, 1.0f,
+
+	    960.0f,  -10.0f, -960.0f,
+		1.0f, 0.0f,
+	};
+
+	std::unique_ptr<nTexture> node;
+
 	/* load player model */
 	nTexture* tex = m_Render->loadTexture("resource/models/2.TIM");
 	pModel.reset(new nf3d("resource/models/2.EMD", tex));
 
+	/* load dummy texture to debug */
+	node.reset(m_Render->loadTexture("resource/ui/dummy.png"));
+	textureList.push_back(std::move(node));
+
+	/* load shadow */
+	m_Shadow.tex.reset(m_Render->loadTexture("resource/textures/shadow.png"));
+	m_Shadow.createVBO(shadow_xyzuv, sizeof(shadow_xyzuv), 2);
+
 	/* hard coded player information */
 	m_Player.setStage(1);
 	m_Player.setMap(6);
-	m_Player.setCam(0);
+	m_Player.setCam(1);
 	m_Player.setModel(2);
 	m_Player.setAngle(90.0f);
-	m_Player.setXYZ(glm::vec3(-25843.0f, 0, -479.0f));
+	m_Player.setXYZ(glm::vec3(18391.0f, 0, 12901.0f));
 	pModel->setAnimSection(EMD_SECTION_4);
 	pModel->setSec4Animation(STAND_SEC4_ANIM_IDLE);
+	/* debug information */
 	m_Debug.currMap = 0;
 
 	/* load room */
-	loadRoom();
+	loadRoom(m_Render, &m_Player, &pRDT_tex, &pRDT, RDT_TYPE_RE1);
 
 	/* load shaders, TODO: plz, you can do better, i know */
 	GLuint currentShader = 0;
@@ -60,7 +69,7 @@ void mainGame::start() {
 	shaderList.push_back(currentShader);
 
 	/* state machine initial state */
-	layers = MAIN_GAME_LAYER_INIT;
+	layers = MAIN_GAME_LAYER_GAME;
 
 	/* disable debug settings */
 	isDebug = false;
@@ -69,7 +78,9 @@ void mainGame::start() {
 
 void mainGame::checkInput() {
 	static bool bPressed = false;
+	static unsigned int raw_pad = 0;
 
+	raw_pad = m_Input->getPad();
 
 	switch (layers) {
 		case MAIN_GAME_LAYER_INIT: {
@@ -77,29 +88,28 @@ void mainGame::checkInput() {
 		}
 		break;
 
+		/* TODO: Better entity moviment handle */
 		case MAIN_GAME_LAYER_GAME: {
 			if (isDebug) {
 				/* debug settings */
-				if (m_Input->getPad() & CORE_PAD_RIGHT) {
+				if (raw_pad & KEY_RIGHT) {
 					if (!bPressed) {
 						m_Debug.nextMap();
 						bPressed = true;
 					}
-				} else if (m_Input->getPad() & CORE_PAD_LEFT) {
+				} else if (raw_pad & KEY_LEFT) {
 					if (!bPressed) {
 						m_Debug.priorMap();
 						bPressed = true;
 					}
-				} else if (m_Input->getPad() & CORE_PAD_OK) {
+				} else if (raw_pad & KEY_OK) {
 					/* warp to room */
-					m_Utils->setupFadeEffect(0.007f, 0.0f, 0.0f, 0.0f, FADE_IN);
 					m_Player.setMap(m_Debug.currMap);
 					m_Player.setCam(0);
 					m_Player.setXYZ(glm::vec3(m_Debug.getMapX(), 0.0f, m_Debug.getMapZ()));
-					loadRoom();
+					loadRoom(m_Render, &m_Player, &pRDT_tex, &pRDT, RDT_TYPE_RE1);
 					m_Utils->setupFadeEffect(0.007f, 0.0f, 0.0f, 0.0f, FADE_OUT);
-					isDebug = false;
-				} else if (m_Input->getPad() & CORE_PAD_CANCELL) {
+				} else if (raw_pad & KEY_CANCELL) {
 					if (!bPressed){
 						bPressed = true;
 						isDebug = false;
@@ -111,16 +121,17 @@ void mainGame::checkInput() {
 
 			} else {
 				/* check angle */
-				if (m_Input->getPad() & CORE_PAD_RIGHT) {
+				if (raw_pad & KEY_RIGHT) {
 					m_Player.getAngle() > 360.0f ? m_Player.setAngle(0.0f) : m_Player.setAngle(m_Player.getAngle() + 4.0f);
 
 					if (m_Player.getAction() == ENTITY_ACTION_IDLE) {
+						
 						if (pModel->getSec4Animation() != STAND_SEC4_ANIM_WALK) {
 							pModel->setSec4Animation(STAND_SEC4_ANIM_WALK);
 						}
 					}
 
-				} else if (m_Input->getPad() & CORE_PAD_LEFT) {
+				} else if (raw_pad & KEY_LEFT) {
 					m_Player.getAngle() < 0.0f ? m_Player.setAngle(360.0f) : m_Player.setAngle(m_Player.getAngle() - 4.0f);
 			
 					if (m_Player.getAction() == ENTITY_ACTION_IDLE) {
@@ -136,12 +147,18 @@ void mainGame::checkInput() {
 					}
 				}
 
-				if (m_Input->getPad() & CORE_PAD_UP) {
+				if (raw_pad & KEY_UP) {
 					if (m_Player.getAction() != ENTITY_ACTION_WALK) {
 						m_Player.setAction(ENTITY_ACTION_WALK);
 						pModel->setAnimSection(EMD_SECTION_4);
+					}
+					
+					if (raw_pad & KEY_OK) {
+						pModel->setSec4Animation(STAND_SEC4_ANIM_RUNNING);
+					} else {
 						pModel->setSec4Animation(STAND_SEC4_ANIM_WALK);
 					}
+
 				} else {
 					if (m_Player.getAction() != ENTITY_ACTION_IDLE) {
 						m_Player.setAction(ENTITY_ACTION_IDLE);	
@@ -151,7 +168,7 @@ void mainGame::checkInput() {
 				}
 
 				/* enable debug ? */
-				if (m_Input->getPad() & CORE_PAD_CANCELL) {
+				if (raw_pad & KEY_CANCELL) {
 					if (!bPressed) {
 						isDebug = true;
 						bPressed = true;
@@ -168,30 +185,71 @@ void mainGame::checkInput() {
 
 
 void mainGame::renderGame() {
-	/* perspective */
-	static glm::mat4 mtx_pers = glm::perspective(glm::radians(60.0f), (float) 640 / (float) 480, 0.1f, 100000.0f);
+	static glm::mat4 mtx_pers = glm::perspective(glm::radians(60.0f), (float) 640 / (float) 480, 1.0f, 100000.0f);
+	static glm::mat4 model = glm::mat4(1.0f);
+	static glm::mat4 mtx_cam = glm::mat4(1.0f);
 
-
-	/* stage stuff */
+	/*======================
+	 *==  Render Scenario ==
+	 *======================*/
 	m_Utils->renderRectangle(pRDT_tex[m_Player.getCam()]->id, {1.0f, 1.0f, 1.0f, 1.0f});
-	m_Render->setShaderId(shaderList[SHADER_MODEL]);
+	/*===================
+	 *==  Perspective  ==
+	  ==     and       ==
+	  ==    Camera     == 
+	 *===================*/
 
-	glm::mat4 mtx_cam = glm::lookAt(glm::vec3(pRDT->rdtCameraPos[m_Player.getCam()].positionX, pRDT->rdtCameraPos[m_Player.getCam()].positionY, pRDT->rdtCameraPos[m_Player.getCam()].positionZ),
-								    glm::vec3(pRDT->rdtCameraPos[m_Player.getCam()].targetX, pRDT->rdtCameraPos[m_Player.getCam()].targetY, pRDT->rdtCameraPos[m_Player.getCam()].targetZ),
-								    glm::vec3(0.0f, -1.0f, 0.0f));
+	/**
+	 * TODO: Again, improve it to a single code, for the sake of God
+	 */
+	switch (pRDT.rdtType) {
+		case RDT_TYPE_RE1:
+			mtx_cam = glm::lookAt(glm::vec3(pRDT.rdtRE1CameraPos[m_Player.getCam()].positionX, pRDT.rdtRE1CameraPos[m_Player.getCam()].positionY, pRDT.rdtRE1CameraPos[m_Player.getCam()].positionZ),
+										    glm::vec3(pRDT.rdtRE1CameraPos[m_Player.getCam()].targetX, pRDT.rdtRE1CameraPos[m_Player.getCam()].targetY, pRDT.rdtRE1CameraPos[m_Player.getCam()].targetZ),
+										    glm::vec3(0.0f, -1.0f, 0.0f));
+		break;
 
+		case RDT_TYPE_RE2_PROTO:
+		case RDT_TYPE_RE2:
+		case RDT_TYPE_RE3:
+			mtx_cam = glm::lookAt(glm::vec3(pRDT.rdtCameraPos[m_Player.getCam()].positionX, pRDT.rdtCameraPos[m_Player.getCam()].positionY, pRDT.rdtCameraPos[m_Player.getCam()].positionZ),
+										    glm::vec3(pRDT.rdtCameraPos[m_Player.getCam()].targetX, pRDT.rdtCameraPos[m_Player.getCam()].targetY, pRDT.rdtCameraPos[m_Player.getCam()].targetZ),
+										    glm::vec3(0.0f, -1.0f, 0.0f));
+		break;
+	}
 
 	m_Render->setProjectionMtx(mtx_pers);
 	m_Render->setViewMtx(mtx_cam);
 
+	/*==============
+	 *==  shadow  ==
+	 *==============*/
 
+	/* change shader to model */
+	m_Render->setShaderId(shaderList[SHADER_MODEL]);
+
+	/*================
+	 *==  3D Model  ==
+	 *================*/
     m_Utils->renderNF3D(m_Player.getXYZ(), m_Player.getAngle(), pModel.get());
 
+    /* change the shader to UI */
 	m_Render->setShaderId(shaderList[SHADER_UI]);
+    model = glm::translate(glm::mat4(1.0f), m_Player.getXYZ());
+    m_Render->setModelMtx(model);
+	m_Utils->render3D_Obj(m_Shadow);
 
-
-	/* debug settings */
+	/*======================
+	 *==  Debug Settings  ==
+	 *======================*/
 	if (isDebug) {
+		model = glm::scale(glm::mat4(1.0f), glm::vec3(0.8f, 0.2f, 0.0));
+		
+		m_Render->setProjectionMtx(glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f));
+		m_Render->setViewMtx(glm::mat4(1.0f));
+		m_Render->setModelMtx(model);
+
+		m_Utils->renderRectangle(textureList[TEXTURE_DEBUG]->id, {0.0f, 0.0f, 0.3f, 0.5f});
 		for (int i = 0; i < 2; i++) {
 			m_Utils->renderText(m_Debug.menu[i].text, m_Debug.menu[i].x, m_Debug.menu[i].y, m_Debug.menu[i].z, FONT_TYPE_SMALL, {1.0f, 1.0f, 1.0f, 1.0f});
 		}
@@ -202,6 +260,7 @@ void mainGame::renderGame() {
 void mainGame::logic() {
 	static float x = 0;
 	static float z = 0;
+	static float speed = 0.0f;
 
 	/*
 	 * Player Actions
@@ -218,108 +277,42 @@ void mainGame::logic() {
 		 * WALK
 		 */
 		case ENTITY_ACTION_WALK: {
-			bool isCollision = false;
 
-			x = cos(glm::radians(m_Player.getAngle())) * 80.0f;
-			z = -sin(glm::radians(m_Player.getAngle()))  * 80.0f;
+			pModel->getSec4Animation() == STAND_SEC4_ANIM_RUNNING ? speed = 180.0f : speed = 80.0f;
 
-			/*
-			 * check collision
-			 */
+			x = cos(glm::radians(m_Player.getAngle()))  * speed;
+			z = -sin(glm::radians(m_Player.getAngle())) * speed;
 
-			for (unsigned int i = 0; i < pRDT->rdtCollisionHeader.amount - 1; i++) {
-				switch(pRDT->rdtCollisionArray[i].type & 0x7) {
-					case 1:
-						if (physics::collision::triangle(m_Player.getXYZ() + glm::vec3(x, 0, z),
-														 glm::vec3(pRDT->rdtCollisionArray[i].x + pRDT->rdtCollisionArray[i].w, 0.0f, pRDT->rdtCollisionArray[i].z),
-														 glm::vec3(pRDT->rdtCollisionArray[i].x + pRDT->rdtCollisionArray[i].w, 0.0f, pRDT->rdtCollisionArray[i].z + pRDT->rdtCollisionArray[i].h),
-														 glm::vec3(pRDT->rdtCollisionArray[i].x, 0.0f, pRDT->rdtCollisionArray[i].z + pRDT->rdtCollisionArray[i].h)
-														 )) {
-
-							isCollision = true;
-						}
-					break;
-
-					case 2:
-						if (physics::collision::triangle(m_Player.getXYZ() + glm::vec3(x, 0, z),
-														 glm::vec3(pRDT->rdtCollisionArray[i].x, 0.0f, pRDT->rdtCollisionArray[i].z),
-														 glm::vec3(pRDT->rdtCollisionArray[i].x + pRDT->rdtCollisionArray[i].w, 0.0f, pRDT->rdtCollisionArray[i].z + pRDT->rdtCollisionArray[i].h),
-														 glm::vec3(pRDT->rdtCollisionArray[i].x, 0.0f, pRDT->rdtCollisionArray[i].z + pRDT->rdtCollisionArray[i].h)
-														 )) {
-
-							isCollision = true;
-						}
-					break;
-
-					case 3:
-						if (physics::collision::triangle(m_Player.getXYZ() + glm::vec3(x, 0, z),
-														 glm::vec3(pRDT->rdtCollisionArray[i].x, 0.0f, pRDT->rdtCollisionArray[i].z),
-														 glm::vec3(pRDT->rdtCollisionArray[i].x + pRDT->rdtCollisionArray[i].w, 0.0f, pRDT->rdtCollisionArray[i].z),
-														 glm::vec3(pRDT->rdtCollisionArray[i].x + pRDT->rdtCollisionArray[i].w, 0.0f, pRDT->rdtCollisionArray[i].z + pRDT->rdtCollisionArray[i].h)
-														 )) {
-
-							isCollision = true;
-						}
-					break;
-
-					case 4:
-						if (physics::collision::triangle(m_Player.getXYZ() + glm::vec3(x, 0, z),
-														 glm::vec3(pRDT->rdtCollisionArray[i].x, 0.0f, pRDT->rdtCollisionArray[i].z),
-														 glm::vec3(pRDT->rdtCollisionArray[i].x + pRDT->rdtCollisionArray[i].w, 0.0f, pRDT->rdtCollisionArray[i].z),
-														 glm::vec3(pRDT->rdtCollisionArray[i].x, 0.0f, pRDT->rdtCollisionArray[i].z + pRDT->rdtCollisionArray[i].h)
-														 )) {
-
-							isCollision = true;
-						}
-					break;
-				} 
-			}
-
-			if (!isCollision)
+			/* verify collision boundaries */
+			if (!checkRoomCollision(&pRDT, m_Player.getXYZ() + glm::vec3(x, 0.0f, z))) {
 				m_Player.setXYZ(m_Player.getXYZ() + glm::vec3(x, 0.0f, z));
-
-			/*
-			 * check switch zone
-			 */
-
-			for (unsigned int i = 0; i < pRDT->rdtCameraSwitch.size(); i++) {
-				if (pRDT->rdtCameraSwitch[i].cam1 != 0) {
-					if (physics::collision::triangle(m_Player.getXYZ(),
-												 glm::vec3(pRDT->rdtCameraSwitch[i].x1, 0, pRDT->rdtCameraSwitch[i].z1),
-												 glm::vec3(pRDT->rdtCameraSwitch[i].x2, 0, pRDT->rdtCameraSwitch[i].z2),
-												 glm::vec3(pRDT->rdtCameraSwitch[i].x4, 0, pRDT->rdtCameraSwitch[i].z4)) || 
-						
-						physics::collision::triangle(m_Player.getXYZ(),
-												 glm::vec3(pRDT->rdtCameraSwitch[i].x2, 0, pRDT->rdtCameraSwitch[i].z2),
-												 glm::vec3(pRDT->rdtCameraSwitch[i].x3, 0, pRDT->rdtCameraSwitch[i].z3),
-												 glm::vec3(pRDT->rdtCameraSwitch[i].x4, 0, pRDT->rdtCameraSwitch[i].z4))) {
-						
-						m_Player.setCam(pRDT->rdtCameraSwitch[i].cam1);		
-					}
-				}								
 			}
+
+			/* verify switch zone */
+			checkSwitchZone(&pRDT, &m_Player);
+
 		}
-		break;
-
-		case ENTITY_ACTION_RUN:
-
 		break;
 	}
 
     /*
      * Call the animation update in nf3d
      */
-    pModel->runAnimation();
+    pModel->run();
 
 }
 
 void mainGame::stateMachine() {
 	static _menu introTest[] { 
-        {"Voce caiu na\narmadilha do coiote", -0.95f, -0.65f, 0.0f, 0, true, 0.0f, 0.2f},
-        {"Sera que voce\nconseguira escapar?", -0.95f, -0.65f, 0.0f, 0, true, 0.0f, 0.2f}
+        {"They have escaped\ninto the mansion", -0.95f, -0.65f, 0.0f, 0, true, 0.0f, 0.5f},
+        {"where they thought\nit was safe. yet...", -0.95f, -0.65f, 0.0f, 0, true, 0.0f, 0.5f}
     };
 
 	static timer actionTmr = {0.0f, 0.0167f, false};
+
+	/**
+	 * TODO: Better code implementation, because urg <_< 
+	 */
 
 	switch (layers) {
 		case MAIN_GAME_LAYER_INIT: {

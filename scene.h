@@ -59,7 +59,7 @@ struct timer {
 class scene {
 public:
 	scene();
-   ~scene();
+    virtual ~scene();
 
    	void setState(const SCENE_STATE& sceneState);
     void setContext(render *m_Render, utils *m_Utils, input *m_Input);

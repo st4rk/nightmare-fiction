@@ -21,6 +21,7 @@ mainMenu::~mainMenu() {
 }
 
 void mainMenu::start() {
+	std::cout << "aeho" << std::endl;
 	nTexture* node = nullptr;
 
 	GLuint currentShader = LoadShaders("game/shaders/vertexShader.glsl", "game/shaders/fragmentShader.glsl");

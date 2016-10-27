@@ -89,7 +89,7 @@ void menuConfig::stateMachine() {
 			if (!m_Utils->isInFade()) {
 				m_Utils->setupFadeEffect(0.007f, 0.0f, 0.0f, 0.0f, FADE_OUT);
 				layers     = CONFIG_LAYER_INIT;
-				sceneState = SCENE_STATE_SLEEP;
+				sceneState = SCENE_STATE_END;
 				nextScene  = 0;
 			}			
 		}

@@ -48,36 +48,26 @@ void input::update() {
  * no return
  */
 void input::keyboardInput() {
+	
+	c_Pad = 0;
+
 	if ( glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS )
 		c_Pad = c_Pad | CORE_PAD_UP;
-	else
-		c_Pad = c_Pad & ~CORE_PAD_UP;
 
 	if ( glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS )
 		c_Pad = c_Pad | CORE_PAD_DOWN;
-	else
-		c_Pad = c_Pad & ~CORE_PAD_DOWN;
 
 	if ( glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS )
 		c_Pad = c_Pad | CORE_PAD_LEFT;
-	else
-		c_Pad = c_Pad & ~CORE_PAD_LEFT;
 
 	if ( glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS )
 		c_Pad = c_Pad | CORE_PAD_RIGHT;
-	else
-		c_Pad = c_Pad & ~CORE_PAD_RIGHT;
 
 	if ( glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS )
 		c_Pad = c_Pad | CORE_PAD_CANCELL;
-	else
-		c_Pad = c_Pad & ~CORE_PAD_CANCELL;
 
 	if ( glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS )
 		c_Pad = (c_Pad | CORE_PAD_OK);
-	else
-		c_Pad = c_Pad & ~CORE_PAD_OK;
-
 }
 
 /*

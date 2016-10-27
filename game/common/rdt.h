@@ -195,8 +195,11 @@ enum RDT_TYPE_LIST {
 
 class RDT {
 public:
-	RDT(const std::string& dir, const RDT_TYPE_LIST& rdtType);
+	RDT();
 	~RDT();
+
+
+	bool load(const std::string& dir, const RDT_TYPE_LIST& rdtType);
 
 	std::vector<RDT_CAMERA_POS_T>          rdtCameraPos;
 	RDT_HEADER_T                           rdtHeader;
@@ -207,8 +210,8 @@ public:
 
 	RDT_RE1_HEADER_T                       rdtRE1Header;
 	std::vector<RDT_RE1_CAMERA_POS_T>      rdtRE1CameraPos;
-	RDT_RE1_SCA_HEADER_T                   rdtRE1ColisionHeader;
-	std::vector<RDT_RE1_SCA_OBJ_T>         rdtRE1ColissionArray;
+	RDT_RE1_SCA_HEADER_T                   rdtRE1CollisionHeader;
+	std::vector<RDT_RE1_SCA_OBJ_T>         rdtRE1CollisionArray;
 	std::vector<RDT_RE1_CAMERA_SWITCH_T>   rdtRE1CameraSwitch;
 
 	std::vector<unsigned char> RDT_RE1_SCD_DATA;
@@ -216,15 +219,14 @@ public:
 	unsigned int door_set_len;
 //	script_door_set_re1 door_set_re1[0x10];
 
+	RDT_TYPE_LIST rdtType;
+
 private:
 	unsigned char      *rdtBuffer;
 	unsigned int        rdtObjectList[23];
 	unsigned int        rdtSize;
 
 	std::vector<unsigned short> rdtSCD;
-
-	RDT_TYPE_LIST rdtType;
-
 
 };
 

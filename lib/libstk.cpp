@@ -154,6 +154,7 @@ bool libstk::loadPNG(const std::string& dir) {
 	    texture[new_pos + 1] = raw[old_pos + 1];
 	    texture[new_pos + 2] = raw[old_pos + 2];
 	    texture[new_pos + 3] = raw[old_pos + 3];
+
 	  }
 	}
 

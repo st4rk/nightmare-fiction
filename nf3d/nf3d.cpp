@@ -153,7 +153,11 @@ nf3d::nf3d(const std::string& dir, nTexture* tex) {
 	animCnt = 0;
 
 	isInterpolation = false;
-	interpolationValue = 0.0f;
+	interTotal = 0.0f;
+	interStep = 0.0f;
+
+	emdSection = EMD_SECTION_4;
+	emdSec4Animation = STAND_SEC4_ANIM_IDLE;
 }
 
 
@@ -172,14 +176,14 @@ void nf3d::setAnimSection(const EMD_SECTION_LIST& emdSection) {
 }
 
 void nf3d::setSec2Animation(const STANDARD_SEC2_ANIMATION& emdSec2Animation) {
-
-	/* check if is necessary do interpolation */
 	if (this->emdSec2Animation != emdSec2Animation) {
-		this->oldEmdSec2Animation = this->emdSec2Animation;
-		oldFrame = animFrame;
 		isInterpolation = true;
-	}
 
+		interStep = 1.0f/8;
+		interTotal = 0.0f;
+
+		oldFrame = animFrame;
+	}
 
 	this->emdSec2Animation = emdSec2Animation;
 }
@@ -187,9 +191,12 @@ void nf3d::setSec2Animation(const STANDARD_SEC2_ANIMATION& emdSec2Animation) {
 void nf3d::setSec4Animation(const STANDARD_SEC4_ANIMATION& emdSec4Animation) {
 
 	if (this->emdSec4Animation != emdSec4Animation) {
-		this->oldEmdSec4Animation = this->emdSec4Animation;
-		interpolationValue = 0.0f;
 		isInterpolation = true;
+
+		interStep = 1.0f/8;
+		interTotal = 0.0f;
+
+		oldFrame = animFrame;
 	}
 
 	this->emdSec4Animation = emdSec4Animation;
@@ -201,11 +208,12 @@ void nf3d::setAnimCnt(const unsigned int& animCnt) {
 
 
 /*
- * runAnimation
+ * run
  * run current animation frame
  * no return
  */
-void nf3d::runAnimation() {
+void nf3d::run() {
+
 	switch (emdSection) {
 		
 		case EMD_SECTION_2:{
@@ -214,35 +222,20 @@ void nf3d::runAnimation() {
 		break;
 
 		case EMD_SECTION_4:{
-
-			/* fail try to interpolation */
 			if (isInterpolation) {
-				if (animCnt < model->emdSec4AnimInfo[emdSec4Animation].animCount - 1) {
-					animCnt++;
-				} else {
-					animCnt = 0;
-				}
-				
+
+				animCnt < model->emdSec4AnimInfo[emdSec4Animation].animCount - 1 ? animCnt++ : animCnt = 0;
 				animFrame = model->emdSec4Data[animCnt + model->emdSec4AnimInfo[emdSec4Animation].animStart];
 
-				for (unsigned int i = 0; i < oldFrame.vector.size(); i++) {
-					/* check the limit */
-					if (i > animFrame.vector.size())
-						break;
+				for (unsigned int i = 0; i < animFrame.vector.size(); i++) {
+					if (i > oldFrame.vector.size()) break;
 
-
-					animFrame.vector[i].x = glm::mix(animFrame.vector[i].x, oldFrame.vector[i].x, interpolationValue);
-					animFrame.vector[i].y = glm::mix(animFrame.vector[i].y, oldFrame.vector[i].y, interpolationValue);
-					animFrame.vector[i].z = glm::mix(animFrame.vector[i].z, oldFrame.vector[i].z, interpolationValue);
-
-
+					animFrame.vector[i].x = physics::interpolation::lerpAngle(oldFrame.vector[i].x, animFrame.vector[i].x, interTotal);
+					animFrame.vector[i].y = physics::interpolation::lerpAngle(oldFrame.vector[i].y, animFrame.vector[i].y, interTotal);
+					animFrame.vector[i].z = physics::interpolation::lerpAngle(oldFrame.vector[i].z, animFrame.vector[i].z, interTotal);
 				}
 
-				if (interpolationValue > 1.0f) {
-					interpolationValue = 0.0f;
-					isInterpolation = false;
-				}
-
+				interTotal < 1.0f ? interTotal += interStep : isInterpolation = false;
 
 			} else {
 				if (animCnt < model->emdSec4AnimInfo[emdSec4Animation].animCount - 1) {
@@ -252,7 +245,7 @@ void nf3d::runAnimation() {
 				}
 				
 				animFrame = model->emdSec4Data[animCnt + model->emdSec4AnimInfo[emdSec4Animation].animStart];
-			}
+			}	
 		}
 		break;
 	}

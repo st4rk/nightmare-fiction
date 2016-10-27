@@ -3,14 +3,39 @@
 
 
 namespace physics {
-	
-	namespace collision {
-		bool rectangle(const float& x,  const float& y,  const float& z,
-					   const float& x1, const float& y1, const float& z1,
-					   const float& x2, const float& y2, const float& z2) {
+	namespace interpolation {
+	    float lerpAngle(float start, float end, float a) {
+	    	/* get absolute value from the difference between angles */
+	        float diff = std::abs(end - start);
 
-			if ((x1 <= x) && (x <= x1+x2)) {
-				if ((z1 <= z) && (z <= z1+z2)) {
+	        	/* check if the difference is big than 180º */
+		        if (diff > 180.0f) {
+		        	/*
+		        	 * if end is big than start, add one
+		        	 * else, add one to end 
+		        	 */
+
+		            end > start ? start += 360.0f : end += 360.0f;
+		        }
+
+	        /* lerp */
+	        float value = (start + ((end - start) * a));
+
+	        /* check if the value is in the rage of 360 */
+	        if (value >= 0.0f && value <= 360.0f)
+	            return value;
+
+	        /* otherwise, module of angle */
+	        return (fmod(value, 360.0f));
+	    }
+	}
+	namespace collision {
+		bool rectangle(const glm::vec3& p1,
+					   const glm::vec3& p2,
+					   const glm::vec3& p3) {
+
+			if ((p2.x <= p1.x) && (p1.x <= p2.x+p3.x)) {
+				if ((p2.z <= p1.z) && (p1.z <= p2.z+p3.z)) {
 					return true;
 				}
 			}
@@ -18,16 +43,16 @@ namespace physics {
 			return false;
 		}
 
-		bool ellipse(const float& x,  const float& y,  const float& z,
-					 const float& x1, const float& y1, const float& z1,
-					 const float& x2, const float& y2, const float& z2) {
+		bool ellipse(const glm::vec3& p1,
+					 const glm::vec3& p2,
+					 const glm::vec3& p3)  {
 
-			double rayX = (x2 - x1) / 2;
-			double rayZ = (z2 - z1) / 2;
-			double cX = x1 + rayX;
-			double cZ = z1 + rayZ;
+			double rayX = (p3.x - p2.x) / 2;
+			double rayZ = (p3.z - p2.z) / 2;
+			double cX = p2.x + rayX;
+			double cZ = p2.z + rayZ;
 
-			double k = pow ((x - cX) / rayX, 2) + pow ((z - cZ) / rayZ, 2);
+			double k = pow ((p1.x - cX) / rayX, 2) + pow ((p1.z - cZ) / rayZ, 2);
 
 			if (k <= 1)
 				return true;

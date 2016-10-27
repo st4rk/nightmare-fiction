@@ -6,17 +6,27 @@
 #include <cmath>
 #include <glm/glm.hpp>
 
+typedef struct Point {
+	int X;
+	int Y;
+} Point;
+
+
 namespace physics {
 
+	namespace interpolation {
+		float lerpAngle(float start, float end, float a);
+	}
+
 	namespace collision {
-		bool rectangle(const float& x,  const float& y,  const float& z,
-					   const float& x1, const float& y1, const float& z1,
-					   const float& x2, const float& y2, const float& z2);
+		bool rectangle(const glm::vec3& p1,
+					   const glm::vec3& p2,
+					   const glm::vec3& p3);
 
 		
-		bool ellipse(const float& x,  const float& y,  const float& z,
-					 const float& x1, const float& y1, const float& z1,
-					 const float& x2, const float& y2, const float& z2);
+		bool ellipse(const glm::vec3& p1,
+					 const glm::vec3& p2,
+					 const glm::vec3& p3);
 
 		bool triangle(const glm::vec3& pI,
 					  const glm::vec3& p1,

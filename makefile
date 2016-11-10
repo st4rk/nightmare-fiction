@@ -1,5 +1,5 @@
 TARGET = nfe
-LIBS = -lm -lGL -lglfw -lGLEW
+LIBS = -lm -lGL -lglfw -lGLEW -lSDL2 -lSDL2_mixer
 CC = g++ 
 CFLAGS = -std=c++11 -g -Wall 
 

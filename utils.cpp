@@ -142,19 +142,19 @@ void utils::renderText(const std::string& text, const float& Xo, const float& Yo
 
 					GLfloat xyz_uv_coord[] = {
 					   -0.03f    + x, -0.03f    + y, 0.0f,
-					    0.0f     + u,  0.97f   - v,
+					    0.001f     + u,  0.97f   - v,
 
 					    0.03f    + x, -0.03f    + y, 0.0f,
 						0.03125f   + u,  0.97f   - v,
 
 					   -0.03f    + x,  0.03f    + y, 0.0f,
-						0.0f     + u,  0.999f  - v,
+						0.001f     + u,  0.999f  - v,
 
 					    0.03f    + x,  0.03f    + y, 0.0f,
 						0.03125f   + u,  0.999f  - v,
 
 					   -0.03f    + x,  0.03f    + y, 0.0f,
-						0.0f     + u,  0.999f  - v,
+						0.001f     + u,  0.999f  - v,
 
 					    0.03f    + x, -0.03f    + y, 0.0f,
 						0.03125f   + u,  0.97f   - v
@@ -249,6 +249,8 @@ void utils::setupFadeEffect(const float& speed, const float& r, const float& g, 
  * handle the fade effect to be rendered
  */
 void utils::doFadeEffect() {
+	static glm::mat4 pos = glm::mat4(1.0f);
+	static glm::mat4 ui_ortho = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f);
 	// check if fade effect is enable
 	if (fade.inFade) {
 		switch (fade.type) {
@@ -288,7 +290,10 @@ void utils::doFadeEffect() {
 			break;
 		}
 
-
+		
+		m_Render->setProjectionMtx(ui_ortho);
+		m_Render->setViewMtx(glm::mat4(1.0f));
+		m_Render->setModelMtx(pos);
 		renderRectangle(fadeTexture.tex->id, fade.r_Color);
 	}
 

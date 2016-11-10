@@ -10,13 +10,13 @@
 #define DEBUG_TYPE_BH2_BETA2 0
 #define DEBUG_TYPE_BH2_PROTO 1
 
-struct RE2_JUMP_ENTRY {
+struct JUMP_ENTRY {
 	float x;
 	float z;
 	std::string roomName;
 };
 
-static RE2_JUMP_ENTRY bh2_proto[] = {
+static JUMP_ENTRY bh2_proto[] = {
 	{-16221.0f, -22346.0f, "              "},
 	{-16221.0f, -22346.0f, "              "},
 	{-26000.0f, -8700.0f, "OFFICE B      "},
@@ -58,7 +58,7 @@ static RE2_JUMP_ENTRY bh2_proto[] = {
 	{-16796.0f, -25105.0f, "DOKUBOU 5     "},
 };
 
-static RE2_JUMP_ENTRY bh2_beta2[] = {
+static JUMP_ENTRY bh2_beta2[] = {
 	{18802.0f, -3164.0f, "URADOURI WEST "},
 	{-15047.0f, -11799.0f, "GUN SHOP      "},
 	{-25059.0f, 20944.0f, "ROJI          "},
@@ -91,6 +91,37 @@ static RE2_JUMP_ENTRY bh2_beta2[] = {
 	{-25059.0f, 20944.0f, "ROJI BAK      "}
 };
 
+static JUMP_ENTRY re1_sample[] = {
+	{3800.0f, 2700.0f, "    SAVE ROOM    "},
+	{19000.0f, 20500.0f, " 1F LEFT STAIRS  "},
+	{3400.0f, 8800.0f, "   VACANT ROOM   "},
+	{3000.0f, 3000.0f, "    F PASSAGE    "},
+	{11600.0f, 2500.0f, "    TEA ROOM     "},
+	{31900.0f, 8600.0f, "   DINING ROOM   "},
+	{17000.0f, 2800.0f, "      HALL       "},
+	{2700.0f, 6600.0f, "     GALLERY     "},
+	{3400.0f, 4000.0f, "    L PASSAGE    "},
+	{24400.0f, 2700.0f, "  TRAP PASSAGE   "},
+	{15200.0f, 3900.0f, "  BACK PASSAGE   "},
+	{3300.0f, 6600.0f, " 1F RIGHT STAIRS "},
+	{13600.0f, 7400.0f, "   GREEN HOUSE   "},
+	{5600.0f, 3000.0f, "TIGER STATUE ROOM"},
+	{7400.0f, 10700.0f, "  EMPLOYEE ROOM  "},
+	{15200.0f, 2550.0f, "       BAR       "},
+	{2800.0f, 10400.0f, "   1F ELEVATOR   "},
+	{2800.0f, 4600.0f, "  DRESSING ROOM  "},
+	{2900.0f, 15300.0f, "    WARDROBE     "},
+	{2800.0f, 2400.0f, "    BATH ROOM    "},
+	{10030.0f, 23449.0f, "     BOILER      "},
+	{2500.0f, 4900.0f, "   TRAP ROOM     "},
+	{4850.0f, 10250.0f, "  LIVING ROOM    "},
+	{2900.0f, 10600.0f, " LARGE GALLERY   "},
+	{6000.0f, 7600.0f, "STAIRS UNDER ROOM"},
+	{6300.0f, 2700.0f, "      STUDY      "},
+	{4500.0f, 4100.0f, " ROOFED PASSAGE  "},
+	{2700.0f, 6000.0f, "   STORE ROOM    "},
+	{3500.0f, 4500.0f, "   WARDROBE S    "}
+};
 
 struct debug {
 	/* TODO: is it really necessary :| ? */
@@ -101,10 +132,10 @@ struct debug {
 
 	void nextMap() {
 		char jump_name[0xFF];
-		if (currMap < 29) {
+		if (currMap < 0x1C) {
 			currMap++;
 			memset(jump_name, 0, 0xFF);
-			sprintf(jump_name, "JUMP %d%02X %s", 1, currMap, bh2_proto[currMap].roomName.c_str());
+			sprintf(jump_name, "JUMP %d%02X %s", 1, currMap, re1_sample[currMap].roomName.c_str());
 			menu[1].text = jump_name;
 		}
 	}
@@ -114,7 +145,7 @@ struct debug {
 		if (currMap > 0) {
 			currMap--;
 			memset(jump_name, 0, 0xFF);
-			sprintf(jump_name, "JUMP %d%02X %s", 1, currMap, bh2_proto[currMap].roomName.c_str());
+			sprintf(jump_name, "JUMP %d%02X %s", 1, currMap, re1_sample[currMap].roomName.c_str());
 			menu[1].text = jump_name;
 		}
 	}
@@ -127,12 +158,12 @@ struct debug {
 
 		char jump_name[0xFF];
 		memset(jump_name, 0, 0xFF);
-		sprintf(jump_name, "JUMP %d%02X %s", 1, currMap, bh2_proto[currMap].roomName.c_str());
+		sprintf(jump_name, "JUMP %d%02X %s", 1, currMap, re1_sample[currMap].roomName.c_str());
 		menu[1].text = jump_name;
 	}
 
-	const float& getMapX() { return bh2_proto[currMap].x; }
-	const float& getMapZ() { return bh2_proto[currMap].z; }
+	const float& getMapX() { return re1_sample[currMap].x; }
+	const float& getMapZ() { return re1_sample[currMap].z; }
 
 };
 

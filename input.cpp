@@ -64,10 +64,18 @@ void input::keyboardInput() {
 		c_Pad = c_Pad | CORE_PAD_RIGHT;
 
 	if ( glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS )
-		c_Pad = c_Pad | CORE_PAD_CANCELL;
+		c_Pad = c_Pad | CORE_PAD_1;
 
 	if ( glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS )
-		c_Pad = (c_Pad | CORE_PAD_OK);
+		c_Pad = c_Pad | CORE_PAD_2;
+
+	if ( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS )
+		c_Pad = c_Pad | CORE_PAD_3;
+
+	if ( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS )
+		c_Pad = c_Pad | CORE_PAD_4;
+
+
 }
 
 /*
@@ -80,6 +88,7 @@ void input::joystickInput() {
 
 	present > 0 ? joyStatus = true : joyStatus = false;
 
+	c_Pad = 0;
 
 	if (present) {
 		int count;
@@ -91,31 +100,25 @@ void input::joystickInput() {
 		}
 		*/
 
-		if ( axes[4] == GLFW_PRESS ) {
+		if ( axes[4] == GLFW_PRESS ) 
 			c_Pad = c_Pad | CORE_PAD_UP;
-		} else {
-			c_Pad = c_Pad & ~CORE_PAD_UP;
-		}
+
 
 		if ( axes[6] == GLFW_PRESS )
 			c_Pad = c_Pad | CORE_PAD_DOWN;
-		else
-			c_Pad = c_Pad & ~CORE_PAD_DOWN;
+
 
 		if ( axes[7] == GLFW_PRESS )
 			c_Pad = c_Pad | CORE_PAD_LEFT;
-		else
-			c_Pad = c_Pad & ~CORE_PAD_LEFT;
+
 
 		if ( axes[5] == GLFW_PRESS )
 			c_Pad = c_Pad | CORE_PAD_RIGHT;
-		else
-			c_Pad = c_Pad & ~CORE_PAD_RIGHT;
+
 
 		if ( axes[14] == GLFW_PRESS )
-			c_Pad = (c_Pad | CORE_PAD_OK);
-		else
-			c_Pad = c_Pad & ~CORE_PAD_OK;
+			c_Pad = (c_Pad | CORE_PAD_2);
+
 
 	}
 

@@ -27,7 +27,6 @@ public:
 	const glm::vec3& getXYZ();
 	const float& getAngle();
 	const ENTITY_ACTION& getAction();
-
 private:
 	ENTITY_ACTION entityAction;
 

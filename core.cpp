@@ -30,7 +30,7 @@ void core::start() {
 	m_Input.setInputType(INPUT_KEYBOARD);
 	m_Utils.start(&m_Render);
 
-	m_Schedule.start(&m_Render, &m_Utils, &m_Input);
+	m_Schedule.start(&m_Render, &m_Utils, &m_Input, &m_Sound);
 
 	coreLoop = true;
 

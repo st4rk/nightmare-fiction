@@ -54,7 +54,7 @@ private:
 	
 	unsigned int width;
 	unsigned int height;
-	unsigned char *texture;
+	std::vector<unsigned char> texture;
 
 	IMAGE_FORMAT format;
 };

@@ -79,6 +79,3 @@ const float& entity::getAngle() { return angle; }
  * return current action
  */
 const ENTITY_ACTION& entity::getAction() { return entityAction; }
-
-
-

@@ -1,16 +1,13 @@
 #include "config.h"
 
 menuConfig::menuConfig() {
-	bg = nullptr;
 	pressed = false;
 	arrow = 0;
 }
 
 
 menuConfig::~menuConfig() {
-	if (bg != nullptr) {
-		delete bg;
-	}
+
 }
 
 void menuConfig::checkInput() {
@@ -24,7 +21,7 @@ void menuConfig::checkInput() {
 			if (arrow < 2) arrow++;
 			pressed = true;
 		}
-	} else if (m_Input->getPad() & CORE_PAD_OK) {
+	} else if (m_Input->getPad() & CORE_PAD_2) {
 		if (!pressed) {
 			switch (arrow) {
 				case 0:
@@ -49,7 +46,7 @@ void menuConfig::checkInput() {
 
 void menuConfig::start() {
 	layers = CONFIG_LAYER_INIT;
-	bg = m_Render->loadTexture("resource/ui/TITLE00.PNG");
+	bg.reset(m_Render->loadTexture("resource/ui/conf.png"));
 }
 
 void menuConfig::stateMachine() {

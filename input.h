@@ -24,8 +24,10 @@ enum INPUT_CONFIGURATION {
 #define CORE_PAD_DOWN     0b00000010
 #define CORE_PAD_LEFT     0b00000100
 #define CORE_PAD_RIGHT    0b00001000
-#define CORE_PAD_OK       0b00010000   
-#define CORE_PAD_CANCELL  0b00100000
+#define CORE_PAD_1        0b00010000   
+#define CORE_PAD_2        0b00100000
+#define CORE_PAD_3        0b01000000 
+#define CORE_PAD_4        0b10000000 
 
 
 

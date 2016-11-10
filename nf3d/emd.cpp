@@ -27,6 +27,7 @@ EMD::EMD(const std::string& dir) {
     // load each dir offset
     for (unsigned int i = 0; i < (emdHeader.dirCount); i++) {
         emdFileSection.push_back(*(unsigned int*)(emdBufferData+emdHeader.dirOffset+(i*4)));
+        printf("Section %d Offset: 0x%X\n", i, emdFileSection[i]);
     }
 
     /*
@@ -45,7 +46,7 @@ EMD::EMD(const std::string& dir) {
     for (unsigned short i = 0; i < sizeSec1_f; i++) {
         for(unsigned short j = 0; j < emdSec1Header[i].dataCount; j++) {
             memcpy(&emdSec1AnimSkelT[i][j], (emdBufferData+emdFileSection[1]+emdSec1Header[i].dataOffset+(j*sizeof(unsigned int))), sizeof(unsigned int));
-         }
+        }
     }
 
     /*
@@ -107,10 +108,8 @@ EMD::EMD(const std::string& dir) {
 
     unsigned int s7ModelOffset = (emdFileSection[7]+12);
 
-
-
     totalAnim = (sizeSec1Header/4);
-    
+
     emdSec2AnimInfo.resize(totalAnim);
 
     unsigned int aux = 0;
@@ -135,6 +134,7 @@ EMD::EMD(const std::string& dir) {
             /*
              * Convert to float
              */
+
             for (unsigned short i = 0; i < emdTotalObj; i++) {
                 if ((i % 2) == 0) {
                     vec.x = (emdSec2Node.angles[aux] | ((emdSec2Node.angles[aux+1] & 0b00001111) << 8));

@@ -5,8 +5,15 @@
 #include <GLFW/glfw3.h>
 #include <memory>
 #include "emd.h"
+#include "plw.h"
 #include "../render.h"
 #include "../physics.h"
+
+
+enum NF3D_TYPE {
+	NF3D_TYPE_EMD,
+	NF3D_TYPE_PLW
+};
 
 struct vertexCnt {
 	unsigned int begin;
@@ -15,7 +22,7 @@ struct vertexCnt {
 
 class nf3d {
 public:
-	nf3d(const std::string& dir, nTexture* tex);
+	nf3d(const std::string& dir, nTexture* tex, const NF3D_TYPE& type);
 	~nf3d();
 
 	const GLuint& getVBO();
@@ -32,8 +39,11 @@ public:
 	void setSec2Animation(const STANDARD_SEC2_ANIMATION& emdSec2Animation);
 	void setSec4Animation(const STANDARD_SEC4_ANIMATION& emdSec4Animation);
 	void setAnimCnt(const unsigned int& animCnt);
+	void setAnimSet(std::vector<EMD_SEC2_DATA_T> animSet, std::vector<EMD_ANIM_INFO> animSetInfo);
+	void removeAnimSet();
 
 	std::unique_ptr<EMD> model;
+	PLW weapon;
 	std::vector<vertexCnt> vCnt;
 	EMD_SEC2_DATA_T animFrame;
 
@@ -51,8 +61,14 @@ private:
 	STANDARD_SEC2_ANIMATION emdSec2Animation;
 	STANDARD_SEC4_ANIMATION emdSec4Animation;
 
+	/* extra anim set */
+	std::vector<EMD_SEC2_DATA_T> animSet;
+	std::vector<EMD_ANIM_INFO> animSetInfo;
+	bool isAnimSet;
 
 	unsigned int animCnt;
+
+	NF3D_TYPE type;
 };
 
 #endif

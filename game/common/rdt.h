@@ -32,9 +32,21 @@ struct RDT_RE1_HEADER_T {
 	RDT_RE1_PART_T unk3[3];
 };
 
+struct RDT_MASK_T {
+	unsigned short cntOffset;
+	unsigned short padding;
+};
+
+struct RDT_MASK_OFFSET_T {
+	unsigned short count;
+	unsigned short unknown; // padding ?
+	unsigned short dst_x;
+	unsigned short dst_y;
+};
+
 struct RDT_RE1_CAMERA_POS_T {
-	signed int mask_offset;
-	signed int tim_mask_offset;
+	unsigned int mask_offset;
+	unsigned int tim_mask_offset;
 
 	signed int positionX;
 	signed int positionY;
@@ -48,14 +60,22 @@ struct RDT_RE1_CAMERA_POS_T {
 struct RDT_RE1_CAMERA_SWITCH_T {
 	unsigned short to;
 	unsigned short from;
-	signed short x1;
-	signed short z1;
-	signed short x2;
-	signed short z2;
-	signed short x3;
-	signed short z3;
-	signed short x4;
-	signed short z4;
+	unsigned short x1;
+	unsigned short z1;
+	unsigned short x2;
+	unsigned short z2;
+	unsigned short x3;
+	unsigned short z3;
+	unsigned short x4;
+	unsigned short z4;
+};
+
+struct RDT_RE1_FLR_STEEP {
+	unsigned short x;
+	unsigned short y;
+	unsigned short w;
+	unsigned short h;
+	unsigned short id;
 };
 
 struct RDT_RE1_SCA_HEADER_T {
@@ -74,20 +94,50 @@ struct RDT_RE1_SCA_OBJ_T {
 	unsigned short floor;
 };
 
-struct script_door_set_re1 {
-	unsigned char opcode;
-	unsigned char id;
+struct RDT_RE1_MASK {
+	unsigned short cntOffset;
+	unsigned short unknown;
+};
+
+struct RDT_MASK_OFFSET {
+	unsigned short count;
+	unsigned short unknown;
+	unsigned short dst_x;
+	unsigned short dst_y;
+};
+
+struct RDT_SQUARE_MASK {
+	unsigned char src_x;
+	unsigned char src_y;
+	unsigned char dst_x;
+	unsigned char dst_y;
+	unsigned short depth;
+	unsigned char padding;
+	unsigned char size;
+};
+
+struct RDT_RECT_MASK {
+	unsigned char src_x;
+	unsigned char src_y;
+	unsigned char dst_x;
+	unsigned char dst_y;
+	unsigned short depth;
+	unsigned short padding;
+	unsigned short width;
+	unsigned short height;
+};
+
+struct SCD_DOOR {
+	unsigned char nStage;
+	unsigned char nRoom;
 	unsigned short x;
 	unsigned short y;
 	unsigned short w;
 	unsigned short h;
-	unsigned char unk0[5];
-	unsigned char next_stage_and_room;
 	unsigned short next_x;
 	unsigned short next_y;
 	unsigned short next_z;
 	unsigned short next_dir;
-	unsigned short unk1;
 };
 
 
@@ -201,6 +251,9 @@ public:
 
 	bool load(const std::string& dir, const RDT_TYPE_LIST& rdtType);
 
+	std::vector<unsigned char> SCD_DATA;
+	std::vector<SCD_DOOR>                  doorList;
+
 	std::vector<RDT_CAMERA_POS_T>          rdtCameraPos;
 	RDT_HEADER_T                           rdtHeader;
 	std::vector<RDT_LIGHT_T>               rdtLight;
@@ -213,20 +266,16 @@ public:
 	RDT_RE1_SCA_HEADER_T                   rdtRE1CollisionHeader;
 	std::vector<RDT_RE1_SCA_OBJ_T>         rdtRE1CollisionArray;
 	std::vector<RDT_RE1_CAMERA_SWITCH_T>   rdtRE1CameraSwitch;
-
-	std::vector<unsigned char> RDT_RE1_SCD_DATA;
-	unsigned short scdSize;
-	unsigned int door_set_len;
-//	script_door_set_re1 door_set_re1[0x10];
-
+	std::vector<RDT_MASK_T>                rdtRE1MaskList;
+	std::vector<RDT_RE1_FLR_STEEP>         rdtRE1StepList;
 	RDT_TYPE_LIST rdtType;
 
 private:
+	unsigned short stepTable(const unsigned short& id);
+
 	unsigned char      *rdtBuffer;
 	unsigned int        rdtObjectList[23];
 	unsigned int        rdtSize;
-
-	std::vector<unsigned short> rdtSCD;
 
 };
 

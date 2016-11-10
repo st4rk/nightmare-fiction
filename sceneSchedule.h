@@ -32,7 +32,7 @@ public:
    ~schedule();
 
    void allocScene(const unsigned int& scene);
-   void start(render *m_Render, utils *m_Utils, input *m_Input);
+   void start(render *m_Render, utils *m_Utils, input *m_Input, sound *m_Sound);
    void dispatch();
 
    unsigned int getSceneNum() const;
@@ -41,7 +41,8 @@ private:
 	render *m_Render;
 	utils  *m_Utils;
 	input  *m_Input;
-
+	sound  *m_Sound;
+	
 	unsigned int n_Scene;
 
 	std::vector<std::unique_ptr<scene>> sceneList;

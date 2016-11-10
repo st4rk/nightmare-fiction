@@ -56,10 +56,11 @@ void schedule::allocScene(const unsigned int& scene) {
  * set the object context to the schedule, it will be used later by the scene objects
  * no return
  */
-void schedule::start(render *m_Render, utils *m_Utils, input *m_Input) {
+void schedule::start(render *m_Render, utils *m_Utils, input *m_Input, sound *m_Sound) {
 	this->m_Render = m_Render;
 	this->m_Utils  = m_Utils;
 	this->m_Input  = m_Input;
+	this->m_Sound  = m_Sound;
 
 	sceneList.resize(3);
 	sceneList[0].reset(new mainMenu);
@@ -79,7 +80,7 @@ void schedule::dispatch() {
 	switch (sceneList[n_Scene]->getState()) {
 		case SCENE_STATE_INIT: {
 			/* init scene */
-			sceneList[n_Scene]->setContext(m_Render, m_Utils, m_Input);
+			sceneList[n_Scene]->setContext(m_Render, m_Utils, m_Input, m_Sound);
 			sceneList[n_Scene]->start();
 			sceneList[n_Scene]->setState(SCENE_STATE_RUN);
 		}
@@ -102,6 +103,7 @@ void schedule::dispatch() {
 
 			/* check if the next scene is valid */
 			if (sceneList[n_Scene] == nullptr) {
+				std::cout << "ohay" << std::endl;
 				allocScene(n_Scene);
 			}
 
@@ -120,7 +122,7 @@ void schedule::dispatch() {
 			n_Scene = sceneList[n_Scene]->getNextScene();
 
 			/* free the old scene object */
-			sceneList[oldScene].release();
+			sceneList[oldScene].reset(nullptr);
 
 			/* check if the next scene is valid */
 			if (sceneList[n_Scene] == nullptr) {

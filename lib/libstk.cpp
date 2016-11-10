@@ -1,37 +1,15 @@
 #include "libstk.h"
 
 libstk::libstk() {
-	texture = nullptr;
 	width   = 0;
 	height  = 0;
 }
 
 
 libstk::~libstk() {
-	if (texture != nullptr)
-		delete [] texture;
-	
 	width   = 0;
 	height  = 0;
-	texture = nullptr;
 }
-
-/*
- * destroy
- * dealloc all resource used
- * no return
- */
-void libstk::destroy() {
-	if (texture != nullptr) {
-		delete [] texture;
-		texture = nullptr;
-	}
-
-	width = 0;
-	height = 0;
-
-}
-
 
 /*
  * PRIVATE FUNCTION
@@ -59,8 +37,8 @@ bool libstk::loadBMP(const std::string& dir, bool remove, color rColor) {
 	fseek(bmp, 0, SEEK_END);
 	size = ftell(bmp);
 	rewind(bmp);
-
-	data = new unsigned char[size];
+	
+	data = new unsigned char [size];
 
 	size_t result = fread(data, 1, size, bmp);
 
@@ -89,7 +67,8 @@ bool libstk::loadBMP(const std::string& dir, bool remove, color rColor) {
 	if (bmpRawSize == 0) bmpRawSize = width * height * 3;
 
 	if (remove) {
-		texture = new unsigned char [width * height * 4];
+		texture.clear();
+		texture.resize(width * height * 4);
 		unsigned char *raw = new unsigned char [bmpRawSize];
 		std::memcpy(raw, (data + bmpRawOffset), bmpRawSize);
 
@@ -109,8 +88,9 @@ bool libstk::loadBMP(const std::string& dir, bool remove, color rColor) {
 		}
 
 	} else {
-		texture = new unsigned char [bmpRawSize];
-		std::memcpy(texture, (data + bmpRawOffset), bmpRawSize);
+		texture.clear();
+		texture.resize(bmpRawSize);
+		std::memcpy(&texture[0], (data + bmpRawOffset), bmpRawSize);
 	}
 
 	delete [] data;
@@ -140,7 +120,8 @@ bool libstk::loadPNG(const std::string& dir) {
 		std::cout << "decode error " << error << ": " << lodepng_error_text(error) << std::endl;
 
 
-	texture = new unsigned char[raw.size()];
+	texture.clear();
+	texture.resize(raw.size());
 
 	unsigned int stride = width * 4;
 
@@ -233,7 +214,8 @@ bool libstk::loadTIM(const std::string& dir) {
 	width  = *(unsigned short*)(data + offsetRel + 8);
 	height = *(unsigned short*)(data + offsetRel + 10);
 
-	texture = new unsigned char  [height * (width * 2) * 3];
+	texture.clear();
+	texture.resize(height * (width * 2) * 3);
 
 	unsigned int offset = 0;
 	unsigned char yOffset = 0;
@@ -322,7 +304,7 @@ unsigned int libstk::getHeight() const { return height; }
  * getTexture
  * return pointer to raw texture
  */
-unsigned char* libstk::getTexture() const { return texture; }
+unsigned char* libstk::getTexture() const { return (unsigned char*)&texture[0]; }
 
 /*
  * getFormat

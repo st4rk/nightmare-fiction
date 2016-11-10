@@ -14,8 +14,10 @@
 #define KEY_DOWN     0b00000010
 #define KEY_LEFT     0b00000100
 #define KEY_RIGHT    0b00001000
-#define KEY_OK       0b00010000 
-#define KEY_CANCELL  0b00100000
+#define KEY_1        0b00010000 
+#define KEY_2        0b00100000
+#define KEY_3        0b01000000 
+#define KEY_4        0b10000000 
 
 enum TEXTURE_LIST {
 	TEXTURE_DEBUG,
@@ -55,9 +57,11 @@ private:
 
 
 	std::unique_ptr<nf3d>  pModel;
-
+	std::unique_ptr<nf3d>  pWeapon;
+	
 	std::vector<std::unique_ptr<nTexture>> textureList;
 	std::vector<std::unique_ptr<nTexture>> pRDT_tex;
+	std::vector<std::unique_ptr<soundChunk>> stepList;
 	std::vector<GLuint> shaderList;
 
 	bool isDebug;

@@ -32,10 +32,11 @@ void scene::setState(const SCENE_STATE& sceneState) {
  * this function set the scene objects context
  * no return
  */
-void scene::setContext(render *m_Render, utils *m_Utils, input *m_Input) {
+void scene::setContext(render *m_Render, utils *m_Utils, input *m_Input, sound *m_Sound) {
 	this->m_Render = m_Render;
 	this->m_Utils  = m_Utils;
 	this->m_Input  = m_Input;
+	this->m_Sound  = m_Sound;
 }
 
 /*

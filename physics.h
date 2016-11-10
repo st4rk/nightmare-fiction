@@ -6,12 +6,6 @@
 #include <cmath>
 #include <glm/glm.hpp>
 
-typedef struct Point {
-	int X;
-	int Y;
-} Point;
-
-
 namespace physics {
 
 	namespace interpolation {
@@ -23,6 +17,10 @@ namespace physics {
 					   const glm::vec3& p2,
 					   const glm::vec3& p3);
 
+		bool rectangle(const glm::vec3& p1,
+					   const glm::vec3& p2,
+					   const glm::vec3& p3,
+					   glm::vec3& normal);
 		
 		bool ellipse(const glm::vec3& p1,
 					 const glm::vec3& p2,
@@ -38,6 +36,12 @@ namespace physics {
 					  const glm::vec3& p1,
 					  const glm::vec3& p2,
 					  const glm::vec3& p3);
+
+		bool rectangle2(const glm::vec3& p1,
+					    const glm::vec3& p2,
+					    const glm::vec3& p3,
+					    const glm::vec3& p4,
+					    glm::vec3& norm);
 
 	}
 }

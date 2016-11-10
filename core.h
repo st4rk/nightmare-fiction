@@ -19,6 +19,7 @@
 #include "render.h"
 #include "input.h"
 #include "utils.h"
+#include "sound.h"
 #include "sceneSchedule.h"
 
 class core {
@@ -33,6 +34,7 @@ private:
 	render m_Render;
 	input  m_Input;
 	utils  m_Utils;
+	sound  m_Sound;
 	schedule m_Schedule;
 
 	bool coreLoop;

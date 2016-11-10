@@ -27,7 +27,7 @@ private:
 	unsigned char arrow;
 	bool pressed;
 	
-	nTexture *bg;
+	std::unique_ptr<nTexture> bg;
 };
 
 #endif

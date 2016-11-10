@@ -32,7 +32,7 @@ void mainMenu::start() {
 	textureList.push_back(node);
 	node = m_Render->loadTexture("resource/ui/intro_2.bmp");
 	textureList.push_back(node);
-	node = m_Render->loadTexture("resource/ui/mainMenu.bmp");
+	node = m_Render->loadTexture("resource/ui/main.PNG");
 	textureList.push_back(node);
 
 	m_Utils->setupFadeEffect(0.007f, 0.0f, 0.0f, 0.0f, FADE_IN_OUT);
@@ -53,7 +53,7 @@ void mainMenu::checkInput() {
 			if (arrow < 2) arrow++;
 			pressed = true;
 		}
-	} else if (m_Input->getPad() & CORE_PAD_OK) {
+	} else if (m_Input->getPad() & CORE_PAD_2) {
 		if (!pressed) {
 			switch (arrow) {
 				case 0: {

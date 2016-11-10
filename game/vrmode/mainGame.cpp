@@ -35,8 +35,12 @@ void mainGame::start() {
 	std::unique_ptr<nTexture> node;
 
 	/* load player model */
-	nTexture* tex = m_Render->loadTexture("resource/models/2.TIM");
-	pModel.reset(new nf3d("resource/models/2.EMD", tex));
+	nTexture* tex = m_Render->loadTexture("resource/models/2_shot.TIM");
+	pModel.reset(new nf3d("resource/models/2_shot.EMD", tex, NF3D_TYPE_EMD));
+	pWeapon.reset(new nf3d("resource/models/PL0BW07.PLW", tex, NF3D_TYPE_PLW));
+
+	/* macgyver to be removed soon */
+	pModel->setAnimSet(pWeapon->weapon.sec2Data, pWeapon->weapon.animList);
 
 	/* load dummy texture to debug */
 	node.reset(m_Render->loadTexture("resource/ui/dummy.png"));
@@ -74,6 +78,26 @@ void mainGame::start() {
 	/* disable debug settings */
 	isDebug = false;
 
+	/* sound effect list */
+	/* TODO: Otimize it, only load the sound effect when necessary */
+
+	/**
+	 * Step sound list
+	 */
+	std::unique_ptr<soundChunk> sound_node;
+	sound_node.reset(new soundChunk("resource/sfx/FT_CPA.WAV"));
+	stepList.push_back(std::move(sound_node));
+	sound_node.reset(new soundChunk("resource/sfx/FT_CPB.WAV"));
+	stepList.push_back(std::move(sound_node));
+	sound_node.reset(new soundChunk("resource/sfx/FT_HAA.WAV"));
+	stepList.push_back(std::move(sound_node));
+	sound_node.reset(new soundChunk("resource/sfx/FT_HAB.WAV"));
+	stepList.push_back(std::move(sound_node));
+	sound_node.reset(new soundChunk("resource/sfx/FT_WDA.WAV"));
+	stepList.push_back(std::move(sound_node));
+	sound_node.reset(new soundChunk("resource/sfx/FT_WDB.WAV"));
+	stepList.push_back(std::move(sound_node));
+
 }
 
 void mainGame::checkInput() {
@@ -102,14 +126,18 @@ void mainGame::checkInput() {
 						m_Debug.priorMap();
 						bPressed = true;
 					}
-				} else if (raw_pad & KEY_OK) {
-					/* warp to room */
-					m_Player.setMap(m_Debug.currMap);
-					m_Player.setCam(0);
-					m_Player.setXYZ(glm::vec3(m_Debug.getMapX(), 0.0f, m_Debug.getMapZ()));
-					loadRoom(m_Render, &m_Player, &pRDT_tex, &pRDT, RDT_TYPE_RE1);
-					m_Utils->setupFadeEffect(0.007f, 0.0f, 0.0f, 0.0f, FADE_OUT);
-				} else if (raw_pad & KEY_CANCELL) {
+				} else if (raw_pad & KEY_3) {
+					if (!bPressed) {
+						/* warp to room */
+						m_Player.setMap(m_Debug.currMap);
+						m_Player.setCam(0);
+						m_Player.setXYZ(glm::vec3(m_Debug.getMapX(), 0.0f, m_Debug.getMapZ()));
+						loadRoom(m_Render, &m_Player, &pRDT_tex, &pRDT, RDT_TYPE_RE1);
+						m_Utils->setupFadeEffect(0.007f, 0.0f, 0.0f, 0.0f, FADE_OUT);
+						bPressed = true;
+					}
+				
+				} else if (raw_pad & KEY_2) {
 					if (!bPressed){
 						bPressed = true;
 						isDebug = false;
@@ -153,7 +181,7 @@ void mainGame::checkInput() {
 						pModel->setAnimSection(EMD_SECTION_4);
 					}
 					
-					if (raw_pad & KEY_OK) {
+					if (raw_pad & KEY_1) {
 						pModel->setSec4Animation(STAND_SEC4_ANIM_RUNNING);
 					} else {
 						pModel->setSec4Animation(STAND_SEC4_ANIM_WALK);
@@ -167,8 +195,16 @@ void mainGame::checkInput() {
 					}
 				}
 
+				/**
+				 * TODO: A cool door system ( : 
+				 */
+				if (raw_pad & KEY_3) {
+					if (!bPressed) {
+					  checkDoor(m_Render, &m_Player, &pRDT_tex, &pRDT, RDT_TYPE_RE1);
+					  bPressed = true;
+					} 
 				/* enable debug ? */
-				if (raw_pad & KEY_CANCELL) {
+				}else if (raw_pad & KEY_2) {
 					if (!bPressed) {
 						isDebug = true;
 						bPressed = true;
@@ -258,8 +294,6 @@ void mainGame::renderGame() {
 }
 
 void mainGame::logic() {
-	static float x = 0;
-	static float z = 0;
 	static float speed = 0.0f;
 
 	/*
@@ -277,19 +311,33 @@ void mainGame::logic() {
 		 * WALK
 		 */
 		case ENTITY_ACTION_WALK: {
+			static unsigned int stepZone = 0;
+			static unsigned int stepCnt1 = 0;
+			static unsigned int stepCnt2 = 0;
 
 			pModel->getSec4Animation() == STAND_SEC4_ANIM_RUNNING ? speed = 180.0f : speed = 80.0f;
 
-			x = cos(glm::radians(m_Player.getAngle()))  * speed;
-			z = -sin(glm::radians(m_Player.getAngle())) * speed;
-
 			/* verify collision boundaries */
-			if (!checkRoomCollision(&pRDT, m_Player.getXYZ() + glm::vec3(x, 0.0f, z))) {
-				m_Player.setXYZ(m_Player.getXYZ() + glm::vec3(x, 0.0f, z));
-			}
+			checkRoomCollision(&pRDT, &m_Player, speed);
 
 			/* verify switch zone */
 			checkSwitchZone(&pRDT, &m_Player);
+
+			/* check current step zone */
+			stepZone = checkStepZone(&m_Player, &pRDT);
+
+			if (pModel->getSec4Animation() == STAND_SEC4_ANIM_RUNNING) {
+				stepCnt1 = 3;
+				stepCnt2 = 13;
+				stepZone++;
+			} else {
+				stepCnt1 = 12;
+				stepCnt2 = 27;
+			}
+
+			if ((pModel->getAnimCnt() == stepCnt1) || (pModel->getAnimCnt() == stepCnt2)) {
+				m_Sound->playSoundChunk(stepList[stepZone]->get(), 0);
+			}
 
 		}
 		break;
@@ -304,8 +352,8 @@ void mainGame::logic() {
 
 void mainGame::stateMachine() {
 	static _menu introTest[] { 
-        {"They have escaped\ninto the mansion", -0.95f, -0.65f, 0.0f, 0, true, 0.0f, 0.5f},
-        {"where they thought\nit was safe. yet...", -0.95f, -0.65f, 0.0f, 0, true, 0.0f, 0.5f}
+        {"They have escaped\ninto the mansion", -0.95f, -0.65f, 0.0f, 0, true, 0.0f, 0.1f},
+        {"where they thought\nit was safe% yet%%%", -0.95f, -0.65f, 0.0f, 0, true, 0.0f, 0.1f}
     };
 
 	static timer actionTmr = {0.0f, 0.0167f, false};

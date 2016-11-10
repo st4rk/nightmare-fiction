@@ -4,6 +4,7 @@
 #include "render.h"
 #include "input.h"
 #include "utils.h"
+#include "sound.h"
 
 enum SCENE_STATE {
 	SCENE_STATE_INIT,
@@ -62,7 +63,7 @@ public:
     virtual ~scene();
 
    	void setState(const SCENE_STATE& sceneState);
-    void setContext(render *m_Render, utils *m_Utils, input *m_Input);
+    void setContext(render *m_Render, utils *m_Utils, input *m_Input, sound *m_Sound);
     virtual void stateMachine();
     virtual void start();
 
@@ -80,6 +81,7 @@ protected:
 	render *m_Render;
 	utils  *m_Utils;
 	input  *m_Input;
+	sound  *m_Sound;
 };
 
 #endif

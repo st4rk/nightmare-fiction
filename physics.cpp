@@ -43,6 +43,20 @@ namespace physics {
 			return false;
 		}
 
+		bool rectangle(const glm::vec3& p1,
+					   const glm::vec3& p2,
+					   const glm::vec3& p3,
+					   glm::vec3& norm) {
+
+			if ((p2.x <= p1.x) && (p1.x <= p2.x+p3.x)) {
+				if ((p2.z <= p1.z) && (p1.z <= p2.z+p3.z)) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
 		bool ellipse(const glm::vec3& p1,
 					 const glm::vec3& p2,
 					 const glm::vec3& p3)  {
@@ -89,6 +103,46 @@ namespace physics {
 				return false;
 
 		}
+
+		bool rectangle2(const glm::vec3& p1,
+			    const glm::vec3& p2,
+			    const glm::vec3& p3,
+			    const glm::vec3& p4,
+			    glm::vec3& norm) {
+
+
+			if ( (p1.x < (p3.x + p4.x)) &&
+				 ((p1.x + p2.x) > p3.x) &&
+				 (p1.z < (p3.z + p4.z)) &&
+				 ((p2.z + p1.z) > p3.z)) {
+
+				float hx = (p2.x + p4.x) * ((p1.x+p2.x)/2 - (p3.x+p4.x)/2);
+				float wy = (p2.z + p4.z) * ((p1.z+p2.z)/2 - (p3.z+p4.z)/2);
+
+				if (wy > hx) {
+					if (wy > -hx) {
+						std::cout << "left" << std::endl;
+						norm = glm::vec3(0.0f, 0.0f, 1.0f);
+					} else {
+						std::cout << "top" << std::endl;
+						norm = glm::vec3(-1.0f, 0.0f, 0.0f);
+					}
+				} else {
+					if (wy > -hx) {
+						std::cout << "right" << std::endl;
+						norm = glm::vec3(1.0f, 0.0f, 0.0f);
+					} else {
+						std::cout << "bottom" << std::endl;
+						norm = glm::vec3(0.0f, 0.0f, -1.0f);
+					}
+				}
+
+				return true;
+			}
+
+			return false;
+		}
+
 
 		
 	}

@@ -21,23 +21,31 @@ mainMenu::~mainMenu() {
 }
 
 void mainMenu::start() {
-	std::cout << "aeho" << std::endl;
 	nTexture* node = nullptr;
 
 	GLuint currentShader = LoadShaders("game/shaders/vertexShader.glsl", "game/shaders/fragmentShader.glsl");
 
 	m_Render->setShaderId(currentShader);
 
-	node = m_Render->loadTexture("resource/ui/intro_1.bmp");
+	node = m_Render->loadTexture("resource/ui/nff.PNG");
 	textureList.push_back(node);
 	node = m_Render->loadTexture("resource/ui/intro_2.bmp");
 	textureList.push_back(node);
 	node = m_Render->loadTexture("resource/ui/main.PNG");
 	textureList.push_back(node);
 
+	std::unique_ptr<soundChunk> sound_node;
+	sound_node.reset(new soundChunk("resource/sfx/BIO02.WAV"));
+	soundList.push_back(std::move(sound_node));
+	sound_node.reset(new soundChunk("resource/sfx/BIO04.WAV"));
+	soundList.push_back(std::move(sound_node));
+	sound_node.reset(new soundChunk("resource/sfx/EVIL01.WAV"));
+	soundList.push_back(std::move(sound_node));
+
 	m_Utils->setupFadeEffect(0.007f, 0.0f, 0.0f, 0.0f, FADE_IN_OUT);
 
 	layers = MAIN_MENU_LAYER_LOGO;
+	inFlash = false;
 
 }
 
@@ -47,24 +55,31 @@ void mainMenu::checkInput() {
 		if (!pressed) {
 			if (arrow > 0) arrow--; 
 			pressed = true;
+			m_Sound->playSoundChunk(soundList[0]->get(), 0);
 		}
 	} else if (m_Input->getPad() & CORE_PAD_DOWN) {
 		if (!pressed) {
 			if (arrow < 2) arrow++;
 			pressed = true;
+			m_Sound->playSoundChunk(soundList[0]->get(), 0);
 		}
 	} else if (m_Input->getPad() & CORE_PAD_2) {
 		if (!pressed) {
 			switch (arrow) {
 				case 0: {
-					m_Utils->setupFadeEffect(0.007f, 0.0f, 0.0f, 0.0f, FADE_IN);
+					m_Utils->setupFadeEffect(0.01f, 1.0f, 1.0f, 1.0f, FADE_OUT);
 					layers = MAIN_MENU_LAYER_START;
+					m_Sound->playSoundChunk(soundList[2]->get(), 0);
+					pressed = true;
+					inFlash = true;
 				}
 				break;
 
 				case 1: {
 					m_Utils->setupFadeEffect(0.007f, 0.0f, 0.0f, 0.0f, FADE_IN);
 					layers = MAIN_MENU_LAYER_CONFIG;
+					m_Sound->playSoundChunk(soundList[1]->get(), 0);
+					pressed = true;
 				}
 				break;
 
@@ -144,13 +159,21 @@ void mainMenu::stateMachine() {
 
 		case MAIN_MENU_LAYER_START: {
 			m_Utils->renderRectangle(textureList[MAIN_MENU_LAYER_START]->id, {1.0f, 1.0f, 1.0f, 1.0f});
-		
-			if (!m_Utils->isInFade()) {
-				m_Utils->setupFadeEffect(0.007f, 0.0f, 0.0f, 0.0f, FADE_OUT);
-				layers = MAIN_MENU_LAYER_SEL;
-				sceneState = SCENE_STATE_END;
-				nextScene  = 2;
+			
+			if (inFlash) {
+				if (!m_Utils->isInFade()) {
+					inFlash = false;
+					m_Utils->setupFadeEffect(0.007f, 0.0f, 0.0f, 0.0f, FADE_IN);
+				}
+			} else {
+				if (!m_Utils->isInFade()) {
+					m_Utils->setupFadeEffect(0.007f, 0.0f, 0.0f, 0.0f, FADE_OUT);
+					layers = MAIN_MENU_LAYER_SEL;
+					sceneState = SCENE_STATE_END;
+					nextScene  = 2;
+				}
 			}
+
 		}
 		break;
 	}

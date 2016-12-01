@@ -122,10 +122,10 @@ namespace physics {
 				if (wy > hx) {
 					if (wy > -hx) {
 						std::cout << "left" << std::endl;
-						norm = glm::vec3(0.0f, 0.0f, 1.0f);
+						norm = glm::vec3(-1.0f, 0.0f, 0.0f);
 					} else {
 						std::cout << "top" << std::endl;
-						norm = glm::vec3(-1.0f, 0.0f, 0.0f);
+						norm = glm::vec3(0.0f, 0.0f, 1.0f);
 					}
 				} else {
 					if (wy > -hx) {
@@ -133,7 +133,7 @@ namespace physics {
 						norm = glm::vec3(1.0f, 0.0f, 0.0f);
 					} else {
 						std::cout << "bottom" << std::endl;
-						norm = glm::vec3(0.0f, 0.0f, -1.0f);
+						norm = glm::vec3(-1.0f, 0.0f, 0.0f);
 					}
 				}
 

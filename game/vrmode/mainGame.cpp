@@ -33,10 +33,22 @@ void mainGame::start() {
 	};
 
 	std::unique_ptr<nTexture> node;
+	std::unique_ptr<nf3d> eModel;
 
 	/* load player model */
-	nTexture* tex = m_Render->loadTexture("resource/models/2_shot.TIM");
-	pModel.reset(new nf3d("resource/models/2_shot.EMD", tex, NF3D_TYPE_EMD));
+	nTexture* tex = m_Render->loadTexture("resource/models/2.TIM");
+	pModel.reset(new nf3d("resource/models/2.EMD", tex, NF3D_TYPE_EMD));
+
+	/* Enemy list */
+	tex = m_Render->loadTexture("resource/models/em18.TIM");
+	eModel.reset(new nf3d("resource/models/em18.EMD", tex, NF3D_TYPE_EMD));
+	em_List.push_back(std::move(eModel));
+	tex = m_Render->loadTexture("resource/models/em11.TIM");
+	eModel.reset(new nf3d("resource/models/em11.EMD", tex, NF3D_TYPE_EMD));
+	em_List.push_back(std::move(eModel));
+
+	/* load test gun */
+	tex = m_Render->loadTexture("resource/models/PL0BW07.TIM");
 	pWeapon.reset(new nf3d("resource/models/PL0BW07.PLW", tex, NF3D_TYPE_PLW));
 
 	/* macgyver to be removed soon */
@@ -50,6 +62,12 @@ void mainGame::start() {
 	m_Shadow.tex.reset(m_Render->loadTexture("resource/textures/shadow.png"));
 	m_Shadow.createVBO(shadow_xyzuv, sizeof(shadow_xyzuv), 2);
 
+	/* player inventory UI */
+	node.reset(m_Render->loadTexture("resource/ui/inventory/1.png"));
+	invUI.push_back(std::move(node));
+	node.reset(m_Render->loadTexture("resource/ui/inventory/2.png"));
+	invUI.push_back(std::move(node));
+
 	/* hard coded player information */
 	m_Player.setStage(1);
 	m_Player.setMap(6);
@@ -57,8 +75,29 @@ void mainGame::start() {
 	m_Player.setModel(2);
 	m_Player.setAngle(90.0f);
 	m_Player.setXYZ(glm::vec3(18391.0f, 0, 12901.0f));
+
+	e_List.resize(2);
+	e_List[0].setAction(ENTITY_ACTION_IDLE);
+	e_List[0].setAngle(90.0f);
+	e_List[0].setXYZ(glm::vec3(15391.0f, 0, 10901.0f));
+	e_List[0].setHP(4);
+	e_List[0].setModel(0);
+
+	e_List[1].setAction(ENTITY_ACTION_IDLE);
+	e_List[1].setAngle(20.0f);
+	e_List[1].setXYZ(glm::vec3(12391.0f, 0, 12901.0f));
+	e_List[1].setHP(4);
+	e_List[1].setModel(1);
+
+
+	for (unsigned int i = 0; i < em_List.size(); i++) {
+		em_List[i]->setAnimSection(EMD_SECTION_2);
+		em_List[i]->setSec2Animation(STAND_SEC2_ANIM_BACKWARD);
+	}
+
 	pModel->setAnimSection(EMD_SECTION_4);
 	pModel->setSec4Animation(STAND_SEC4_ANIM_IDLE);
+
 	/* debug information */
 	m_Debug.currMap = 0;
 
@@ -98,6 +137,30 @@ void mainGame::start() {
 	sound_node.reset(new soundChunk("resource/sfx/FT_WDB.WAV"));
 	stepList.push_back(std::move(sound_node));
 
+	/**
+	 * Just for test
+	 */
+	std::unique_ptr<musicChunk> music_node;
+	music_node.reset(new musicChunk("resource/sfx/Bgm_00.wav"));
+	musicList.push_back(std::move(music_node));
+	music_node.reset(new musicChunk("resource/sfx/BGM_0E.WAV"));
+	musicList.push_back(std::move(music_node));
+
+	srand(time(NULL));
+
+
+	item item_node;
+
+	item_node.setName("Remington M1100-P");
+	item_node.setType(ITEM_TYPE_GUN);
+	item_node.setDamage(2);
+	item_node.setAmount(10);
+	itemList.push_back(item_node);
+
+	rTmr.ms  = 0;
+	rTmr.sec = 0;
+	rTmr.min = 0;
+	rTmr.tick = 0;
 }
 
 void mainGame::checkInput() {
@@ -107,6 +170,16 @@ void mainGame::checkInput() {
 	raw_pad = m_Input->getPad();
 
 	switch (layers) {
+		case MAIN_GAME_LAYER_INV: {
+
+		}
+		break;
+
+		case MAIN_GAME_LAYER_DOOR: {
+
+		}
+		break;
+
 		case MAIN_GAME_LAYER_INIT: {
 
 		}
@@ -148,77 +221,146 @@ void mainGame::checkInput() {
 
 
 			} else {
-				/* check angle */
-				if (raw_pad & KEY_RIGHT) {
-					m_Player.getAngle() > 360.0f ? m_Player.setAngle(0.0f) : m_Player.setAngle(m_Player.getAngle() + 4.0f);
 
-					if (m_Player.getAction() == ENTITY_ACTION_IDLE) {
-						
-						if (pModel->getSec4Animation() != STAND_SEC4_ANIM_WALK) {
-							pModel->setSec4Animation(STAND_SEC4_ANIM_WALK);
-						}
-					}
+				if (raw_pad & KEY_4) {
+					if (m_Player.getAction() != ENTITY_ACTION_IDLE) m_Player.setAction(ENTITY_ACTION_IDLE);
+				
+					if (pModel->getAnimSection() != EMD_SECTION_4) pModel->setAnimSection(EMD_SECTION_4);
+					
+						if (raw_pad & KEY_UP) {
+							pModel->setSec4Animation(STAND_SEC4_ANIM_UAIM);
+						} else if (raw_pad & KEY_DOWN) {
+							pModel->setSec4Animation(STAND_SEC4_ANIM_DAIM);
+						} else if (raw_pad & KEY_LEFT) {
+							m_Player.getAngle() < 0.0f ? m_Player.setAngle(360.0f) : m_Player.setAngle(m_Player.getAngle() - 4.0f);
+						} else if (raw_pad & KEY_RIGHT) {
+							m_Player.getAngle() > 360.0f ? m_Player.setAngle(0.0f) : m_Player.setAngle(m_Player.getAngle() + 4.0f);
+						} else {
+							if (raw_pad & KEY_3) {
+								if (pModel->getSec4Animation() != STAND_SEC4_ANIM_SHOOTING) {
+									pModel->setSec4Animation(STAND_SEC4_ANIM_SHOOTING);
+								}
 
-				} else if (raw_pad & KEY_LEFT) {
-					m_Player.getAngle() < 0.0f ? m_Player.setAngle(360.0f) : m_Player.setAngle(m_Player.getAngle() - 4.0f);
-			
-					if (m_Player.getAction() == ENTITY_ACTION_IDLE) {
-						if (pModel->getSec4Animation() != STAND_SEC4_ANIM_WALK) {
-							pModel->setSec4Animation(STAND_SEC4_ANIM_WALK);
+								if (pModel->getAnimCnt() == 16) {
+									shoot(&m_Player, &e_List[0]);
+								}
+	
+							} else {
+								pModel->setSec4Animation(STAND_SEC4_ANIM_AIM);
+							}
 						}
-					}
+
 				} else {
-					if (m_Player.getAction() == ENTITY_ACTION_IDLE) {
-						if (pModel->getSec4Animation() == STAND_SEC4_ANIM_WALK) {
+					/* check angle */
+					if (raw_pad & KEY_RIGHT) {
+						m_Player.getAngle() > 360.0f ? m_Player.setAngle(0.0f) : m_Player.setAngle(m_Player.getAngle() + 4.0f);
+
+						if (m_Player.getAction() == ENTITY_ACTION_IDLE) {
+							
+							if (pModel->getSec4Animation() != STAND_SEC4_ANIM_WALK) {
+								pModel->setSec4Animation(STAND_SEC4_ANIM_WALK);
+							}
+						}
+
+					} else if (raw_pad & KEY_LEFT) {
+						m_Player.getAngle() < 0.0f ? m_Player.setAngle(360.0f) : m_Player.setAngle(m_Player.getAngle() - 4.0f);
+				
+						if (m_Player.getAction() == ENTITY_ACTION_IDLE) {
+							if (pModel->getSec4Animation() != STAND_SEC4_ANIM_WALK) {
+								pModel->setSec4Animation(STAND_SEC4_ANIM_WALK);
+							}
+						}
+					} else {
+						if (m_Player.getAction() == ENTITY_ACTION_IDLE) {
+							if (pModel->getSec4Animation() == STAND_SEC4_ANIM_WALK) {
+								pModel->setSec4Animation(STAND_SEC4_ANIM_IDLE);
+							}
+						}
+					}
+
+					if (raw_pad & KEY_UP) {
+						if (m_Player.getAction() != ENTITY_ACTION_WALK) {
+							m_Player.setAction(ENTITY_ACTION_WALK);
+							pModel->setAnimSection(EMD_SECTION_4);
+						}
+						
+						if (raw_pad & KEY_1) {
+							pModel->setSec4Animation(STAND_SEC4_ANIM_RUNNING);
+						} else {
+							pModel->setSec4Animation(STAND_SEC4_ANIM_WALK);
+						}
+
+					} else if (raw_pad & KEY_DOWN) {
+						if ((m_Player.getAction() != ENTITY_ACTION_WALK) || (pModel->getAnimSection() != EMD_SECTION_2)) {
+							m_Player.setAction(ENTITY_ACTION_WALK);
+						}
+						
+						pModel->setAnimSection(EMD_SECTION_2);
+						pModel->setSec2Animation(STAND_SEC2_ANIM_SBACKWARD);
+
+					} else {
+						if (m_Player.getAction() != ENTITY_ACTION_IDLE) {
+							m_Player.setAction(ENTITY_ACTION_IDLE);	
+							pModel->setAnimSection(EMD_SECTION_4);
 							pModel->setSec4Animation(STAND_SEC4_ANIM_IDLE);
 						}
 					}
-				}
 
-				if (raw_pad & KEY_UP) {
-					if (m_Player.getAction() != ENTITY_ACTION_WALK) {
-						m_Player.setAction(ENTITY_ACTION_WALK);
-						pModel->setAnimSection(EMD_SECTION_4);
-					}
-					
-					if (raw_pad & KEY_1) {
-						pModel->setSec4Animation(STAND_SEC4_ANIM_RUNNING);
+				
+					/**
+					 * TODO: A cool door system ( : 
+					 */
+					if (raw_pad & KEY_3) {
+						if (!bPressed) {
+						  if (checkDoor(m_Render, &m_Player, &pRDT_tex, &pRDT, RDT_TYPE_RE1)) {
+						  	m_Utils->setupFadeEffect(0.007f, 0.0f, 0.0f, 0.0f, FADE_OUT);
+						  	layers = MAIN_GAME_LAYER_DOOR;
+						  }
+						  bPressed = true;
+						} 
+					/* enable debug ? */
+					}else if (raw_pad & KEY_2) {
+						if (!bPressed) {
+							isDebug = true;
+							bPressed = true;
+							m_Debug.update(m_Player.getMap());
+						}
 					} else {
-						pModel->setSec4Animation(STAND_SEC4_ANIM_WALK);
-					}
-
-				} else {
-					if (m_Player.getAction() != ENTITY_ACTION_IDLE) {
-						m_Player.setAction(ENTITY_ACTION_IDLE);	
-						pModel->setAnimSection(EMD_SECTION_4);
-						pModel->setSec4Animation(STAND_SEC4_ANIM_IDLE);
+						bPressed = false;
 					}
 				}
 
-				/**
-				 * TODO: A cool door system ( : 
-				 */
-				if (raw_pad & KEY_3) {
-					if (!bPressed) {
-					  checkDoor(m_Render, &m_Player, &pRDT_tex, &pRDT, RDT_TYPE_RE1);
-					  bPressed = true;
-					} 
-				/* enable debug ? */
-				}else if (raw_pad & KEY_2) {
-					if (!bPressed) {
-						isDebug = true;
-						bPressed = true;
-						m_Debug.update(m_Player.getMap());
-					}
-				} else {
-					bPressed = false;
-				}
 			}
 		}
 	}
 
 }
 
+/**
+ * Render Player Inventory
+ */
+void mainGame::renderInv() {
+	static glm::mat4 model = glm::mat4(1.0f);
+	m_Render->setProjectionMtx(glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f));
+	m_Render->setViewMtx(glm::mat4(1.0f));
+	m_Render->setShaderId(shaderList[SHADER_UI]);
+
+	/** background */
+	for (int x = 0; x < 10; x++) {
+		model = glm::translate(glm::mat4(1.0f), glm::vec3(-0.899f, -1.0f, 1.0f));
+		model = glm::translate(model, glm::vec3(0.2f * x, 0.0f, 0.0f));
+		for (int y = 0; y < 10; y++) {
+			m_Render->setModelMtx(model);
+			m_Utils->renderTexture(invUI[1]->id, {0.0f, 0.0f, 0.2f, 0.1f}, {0.0f, 0.0f, 0.235f, 0.31f}, {1.0f, 1.0f, 1.0f, 1.0f});
+			model = glm::translate(model, glm::vec3(0.0f, 0.2f, 0.0f));
+		}
+	}
+
+	/* background 2 */
+	model = glm::mat4(1.0f);
+	m_Render->setModelMtx(model);
+	m_Utils->renderTexture(invUI[0]->id, {0.0f, 0.0f, 0.2f, 0.1f}, {0.0f, 0.0f, 0.235f, 0.31f}, {1.0f, 1.0f, 1.0f, 1.0f});
+}
 
 void mainGame::renderGame() {
 	static glm::mat4 mtx_pers = glm::perspective(glm::radians(60.0f), (float) 640 / (float) 480, 1.0f, 100000.0f);
@@ -229,6 +371,7 @@ void mainGame::renderGame() {
 	 *==  Render Scenario ==
 	 *======================*/
 	m_Utils->renderRectangle(pRDT_tex[m_Player.getCam()]->id, {1.0f, 1.0f, 1.0f, 1.0f});
+
 	/*===================
 	 *==  Perspective  ==
 	  ==     and       ==
@@ -266,14 +409,32 @@ void mainGame::renderGame() {
 
 	/*================
 	 *==  3D Model  ==
+	 *==  Player    ==
 	 *================*/
-    m_Utils->renderNF3D(m_Player.getXYZ(), m_Player.getAngle(), pModel.get());
+    m_Utils->renderNF3D(m_Player.getXYZ(), m_Player.getAngle(), pModel.get(), pWeapon.get());
+   
+   	for (unsigned int i = 0; i < e_List.size(); i++) {
+    	m_Utils->renderNF3D(e_List[i].getXYZ(), e_List[i].getAngle(), em_List[e_List[i].getModel()].get(), nullptr);
+   	}
+   
+	/*================
+	 *==  3D Model  ==
+	 *==  Enemies   ==
+	 *================*/
 
     /* change the shader to UI */
 	m_Render->setShaderId(shaderList[SHADER_UI]);
     model = glm::translate(glm::mat4(1.0f), m_Player.getXYZ());
     m_Render->setModelMtx(model);
 	m_Utils->render3D_Obj(m_Shadow);
+
+	for (unsigned int i = 0; i < e_List.size(); i++) {
+		if (e_List[i].getAction() != ENTITY_ACTION_DEATH) {
+	    	model = glm::translate(glm::mat4(1.0f), e_List[i].getXYZ());
+	    	m_Render->setModelMtx(model);
+			m_Utils->render3D_Obj(m_Shadow);
+		}
+	}
 
 	/*======================
 	 *==  Debug Settings  ==
@@ -290,6 +451,33 @@ void mainGame::renderGame() {
 			m_Utils->renderText(m_Debug.menu[i].text, m_Debug.menu[i].x, m_Debug.menu[i].y, m_Debug.menu[i].z, FONT_TYPE_SMALL, {1.0f, 1.0f, 1.0f, 1.0f});
 		}
 	}
+	
+	/*==================
+	 *== Main Game UI ==
+	 *==================*/
+	m_Utils->renderText(itemList[0].getName(), -0.9f, -0.9f, 0.0f, FONT_TYPE_SMALL, {1.0f, 1.0f, 1.0f, 1.0f});
+
+
+	if (rTmr.tick < glfwGetTime()) {
+		rTmr.tick = glfwGetTime() + 0.1f;
+		
+		if (rTmr.ms > 59) {
+			rTmr.ms = 0;
+			rTmr.sec++;
+			if (rTmr.sec > 59) {
+				rTmr.sec = 0;
+				rTmr.min++;
+			} 
+		} else {
+			rTmr.ms++;
+		}
+	}
+
+	char buffer[0xFF];
+	memset(buffer, 0, 0xFF);
+	sprintf(buffer, "%01d:%02d:%02d", rTmr.min, rTmr.sec, rTmr.ms);
+	
+	m_Utils->renderText(buffer, -0.3f, 0.8f, 0.0f, FONT_TYPE_BIG, {0.0f, 1.0f, 0.0f, 1.0f});
 
 }
 
@@ -316,7 +504,10 @@ void mainGame::logic() {
 			static unsigned int stepCnt2 = 0;
 
 			pModel->getSec4Animation() == STAND_SEC4_ANIM_RUNNING ? speed = 180.0f : speed = 80.0f;
-
+			if (pModel->getAnimSection() == EMD_SECTION_2) {
+				if (pModel->getSec2Animation() == STAND_SEC2_ANIM_SBACKWARD)
+					speed = -60.0f;
+			}
 			/* verify collision boundaries */
 			checkRoomCollision(&pRDT, &m_Player, speed);
 
@@ -343,11 +534,16 @@ void mainGame::logic() {
 		break;
 	}
 
+
+	for (unsigned int i = 0; i < em_List.size(); i++) {
+		(*ai_zombie_custom[e_List[i].getAction()])(&e_List[i], &m_Player, &pRDT, em_List[i].get());
+		em_List[i]->run();
+	}
+
     /*
      * Call the animation update in nf3d
      */
     pModel->run();
-
 }
 
 void mainGame::stateMachine() {
@@ -381,6 +577,7 @@ void mainGame::stateMachine() {
 		    	if (introTest[currState].anim == false) {
 					m_Utils->setupFadeEffect(0.007f, 0.0f, 0.0f, 0.0f, FADE_OUT);
 		    		layers = MAIN_GAME_LAYER_GAME;
+		    		m_Sound->playMusic(musicList[rand() % 1]->get(),-1);
 		    	}
 
    				introTest[currState].checkTmr();
@@ -397,6 +594,20 @@ void mainGame::stateMachine() {
 			}
 
 			renderGame();
+		}
+		break;
+
+		case MAIN_GAME_LAYER_DOOR: {
+			m_Utils->renderText("Loading%%%", -0.88f, -0.88f, 0.0f, FONT_TYPE_BIG, {1.0f, 1.0f, 1.0f, 1.0f});
+			if (!m_Utils->isInFade()) {
+				m_Utils->setupFadeEffect(0.007f, 0.0f, 0.0f, 0.0f, FADE_OUT);
+		    	layers = MAIN_GAME_LAYER_GAME;
+			}
+		}	
+		break;
+
+		case MAIN_GAME_LAYER_INV: {
+			renderInv();
 		}
 		break;
 	}

@@ -40,6 +40,7 @@ void utils::start(render *m_Render) {
 
 	glGenBuffers(1, &fontSet.vbo);
 	glGenBuffers(1, &utilsVBO);
+	glGenBuffers(1, &ui.vbo);
 
 	glBindBuffer(GL_ARRAY_BUFFER, utilsVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_rectangle_data), vertex_rectangle_data, GL_STATIC_DRAW);
@@ -278,7 +279,7 @@ void utils::doFadeEffect() {
 			break;
 
 			case FADE_BLINK:
-
+				
 			break;
 
 			case FADE_IN_OUT:
@@ -315,7 +316,7 @@ bool utils::isInFade() const { return fade.inFade; }
 
 void utils::renderNF3D_anim(unsigned int objNum, unsigned int var, int var2, nf3d* obj) {
 
-    if (var == objNum) {
+	if (var == objNum) {
         modelMtx = glm::translate(modelMtx, glm::vec3(obj->model->emdSec2RelPos[var2].x,
 													  obj->model->emdSec2RelPos[var2].y,
 													  obj->model->emdSec2RelPos[var2].z));
@@ -326,10 +327,11 @@ void utils::renderNF3D_anim(unsigned int objNum, unsigned int var, int var2, nf3
      	
         m_Render->setModelMtx(modelMtx);
     }
-	
+
     for (unsigned int c = 0; c < obj->model->emdSec2Armature[var].meshCount; c++) {
         renderNF3D_anim(objNum, obj->model->emdSec2Mesh[var][c], var2, obj);
     }
+	
 }
 
 
@@ -338,9 +340,9 @@ void utils::renderNF3D_anim(unsigned int objNum, unsigned int var, int var2, nf3
  * this function will render Resident Evil 1.5 and 2 EMD files
  * no return
  */
-void utils::renderNF3D(const glm::vec3& pos, const float& angle, nf3d* obj) {
+void utils::renderNF3D(const glm::vec3& pos, const float& angle, nf3d* obj, nf3d* obj_2) {
 	GLuint m_Color = glGetUniformLocation(m_Render->getCurrentShader(), "m_Color");
-	
+
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, obj->getTexId());
 	glUniform4f(m_Color, 1.0f, 1.0f, 1.0f, 1.0f);
@@ -361,9 +363,72 @@ void utils::renderNF3D(const glm::vec3& pos, const float& angle, nf3d* obj) {
 			renderNF3D_anim(i, j, j, obj);
 		}
 
+
+		/* render weapon */
+		/* TODO: Improve it */
+		if ((i == 11) && (obj_2 != nullptr) && (obj->isAnimSet)) {
+			glBindTexture(GL_TEXTURE_2D, obj_2->getTexId());
+			glBindBuffer(GL_ARRAY_BUFFER, obj_2->getVBO());
+
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)0x0);
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)0xC);
+			glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)0x14);
+			glDrawArrays(GL_TRIANGLES, obj_2->vCnt[0].begin, obj_2->vCnt[0].total);
+
+			glBindTexture(GL_TEXTURE_2D, obj->getTexId());
+			glBindBuffer(GL_ARRAY_BUFFER, obj->getVBO());
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)0x0);
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)0xC);
+			glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)0x14);
+		}
+		
 		glDrawArrays(GL_TRIANGLES, obj->vCnt[i].begin, obj->vCnt[i].total);
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);
+
+}
+
+/**
+ * render texture rectangle into screen
+ */
+void utils::renderTexture(const GLuint& texID, const RECT& rec1, const RECT& rec2, const color& r_Color) {
+	GLuint m_Color = glGetUniformLocation(m_Render->getCurrentShader(), "m_Color");
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texID);
+	glUniform4f(m_Color, r_Color.r, r_Color.g, r_Color.b, r_Color.a);
+
+	GLfloat xyz_uv_coord[] = {
+	   -rec1.w, -rec1.h, 0.0f,
+	   	rec2.x,  rec2.y,
+	   
+	    rec1.w, -rec1.h, 0.0f,
+	    rec2.w,  rec2.y,
+	   
+	   -rec1.w,  rec1.h, 0.0f,
+		rec2.x,  rec2.h,
+
+	    rec1.w,  rec1.h, 0.0f,
+		rec2.w,  rec2.h,
+
+	   -rec1.w,  rec1.h, 0.0f,
+	    rec2.x,  rec2.h,
+
+	    rec1.w, -rec1.h, 0.0f,
+	    rec2.w,  rec2.y
+	};
+
+	glBindBuffer(GL_ARRAY_BUFFER, ui.vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(xyz_uv_coord), xyz_uv_coord, GL_STREAM_DRAW);
+	
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (void*)0x0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (void*)0xC);
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
 }

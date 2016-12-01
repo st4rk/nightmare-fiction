@@ -12,9 +12,9 @@ void main() {
 	// TODO: write the proper shader, it's just a 
 	// curiosity/fun shader and please *don't dare to use it*
 	vec3 norm = normalize(Normal);
-	vec3 lightDir = vec3(5.0f, 5.0f, 0.0f);
+	vec3 lightDir = vec3(5.0f, 0.0f, 5.0f);
 
-	float diff = max(dot(norm, lightDir), 0.0);
+	float diff = max(dot(norm, lightDir), 3.0);
 
 	vec4 diffuse = diff * vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	vec4 ambient = vec4(1.0f, 1.0f, 1.0f, 1.0f);

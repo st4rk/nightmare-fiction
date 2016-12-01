@@ -1,6 +1,34 @@
 #include "room.h"
 
 
+
+/**
+ * shoot
+ * verify and update entities after a shoot
+ * TODO: Better code
+ */
+void shoot(player *p, entity *e) {
+	glm::vec3 dir = glm::vec3(cos(glm::radians(p->getAngle())), 
+		                      0.0f,
+		                     -sin(glm::radians(p->getAngle())));
+
+	float D = glm::distance(p->getXYZ(), e->getXYZ());
+	
+	dir = p->getXYZ() + dir * D;
+
+	if (glm::distance(e->getXYZ(), dir) < 1000.0f) {		
+		if (e->getHP() > 0) {
+			e->setHP(e->getHP() - 1);
+			if (e->getHP() == 0) {
+				e->setAction(ENTITY_ACTION_DEATH);
+			} else {
+				e->setAction(ENTITY_ACTION_HIT);
+			}
+		} 
+	}
+
+}
+
 /*
  * loadRoom
  * will load room information
@@ -158,7 +186,7 @@ void checkSwitchZone(RDT *pRDT, player *m_Player) {
  * 
  * 
  */
-void checkRoomCollision(RDT *pRDT, player *m_Player, const float& speed) {
+void checkRoomCollision(RDT *pRDT, entity *m_Player, const float& speed) {
 	/**
 	 * TODO: Use float to collision boundaries
 	 * TODO2: don't use isRectangle macgyver, fix it to ellipse too
@@ -303,7 +331,7 @@ void checkRoomCollision(RDT *pRDT, player *m_Player, const float& speed) {
 /**
  * checkDoor
  */
-void checkDoor(render *m_Render, player* m_Player, std::vector<std::unique_ptr<nTexture>> *pRDT_tex, RDT *pRDT, const RDT_TYPE_LIST& rdtType) {
+bool checkDoor(render *m_Render, player* m_Player, std::vector<std::unique_ptr<nTexture>> *pRDT_tex, RDT *pRDT, const RDT_TYPE_LIST& rdtType) {
 	for (unsigned int i = 0; i < pRDT->doorList.size(); i++) {
 		if (physics::collision::rectangle(m_Player->getXYZ(),
 										 glm::vec3(pRDT->doorList[i].x, 0.0f, pRDT->doorList[i].y),
@@ -317,9 +345,11 @@ void checkDoor(render *m_Render, player* m_Player, std::vector<std::unique_ptr<n
 			m_Player->setCam(0);
 			m_Player->setXYZ(glm::vec3(pRDT->doorList[i].next_x, pRDT->doorList[i].next_y, pRDT->doorList[i].next_z));
 			loadRoom(m_Render, m_Player, pRDT_tex, pRDT, RDT_TYPE_RE1);
-			break;
+			return true;
 		}
 	}
+
+	return false;
 }
 
 /**

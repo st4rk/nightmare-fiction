@@ -14,6 +14,7 @@ OBJECTS += $(patsubst %.cpp, %.o, $(wildcard shaders/*.cpp))
 OBJECTS += $(patsubst %.cpp, %.o, $(wildcard lib/*.cpp)) 
 OBJECTS += $(patsubst %.cpp, %.o, $(wildcard game/mainmenu/*.cpp)) 
 OBJECTS += $(patsubst %.cpp, %.o, $(wildcard game/common/*.cpp)) 
+OBJECTS += $(patsubst %.cpp, %.o, $(wildcard game/common/AI/*.cpp)) 
 OBJECTS += $(patsubst %.cpp, %.o, $(wildcard game/vrmode/*.cpp)) 
 OBJECTS += $(patsubst %.cpp, %.o, $(wildcard nf3d/*.cpp))
 HEADERS = $(wildcard *.h) $(wildcard shaders/*.h) 
@@ -30,7 +31,8 @@ clean:
 	-rm -f *.o
 	-rm -f game/mainmenu/*.o
 	-rm -f game/vrmode/*.o
-	-rm -f game/common/*.o
+	-rm -f game/common/*.o	
+	-rm -f game/common/AI/*.o
 	-rm -f shaders/*.o
 	-rm -f nf3d/*.o
 	-rm -f lib/*.o

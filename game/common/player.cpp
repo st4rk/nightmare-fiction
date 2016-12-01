@@ -7,7 +7,6 @@ player::player() {
 	stage = 0;
 }
 
-
 player::~player() {
 	map = 0;
 	cam = 0;

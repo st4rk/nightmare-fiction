@@ -2,6 +2,7 @@
 #define _PLAYER_H_
 
 #include "entity.h"
+#include "item.h"
 
 class player: public entity {
 public:
@@ -18,6 +19,7 @@ public:
 	const unsigned int& getStage();
 
 private:
+	unsigned int itemList[10];
 	unsigned int stage;
 	unsigned int map;
 	unsigned int cam;

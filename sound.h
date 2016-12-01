@@ -46,6 +46,7 @@ public:
     ~sound();
 
     bool playSoundChunk(Mix_Chunk *chunk, int loop);
+    bool playMusic(Mix_Music *chunk, int loop);
 
 private:
 

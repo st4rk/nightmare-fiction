@@ -102,7 +102,7 @@ bool render::initGL() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, GL_CTX_MAJOR_VERSION);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, GL_CTX_MINOR_VERSION); // using OpenGL 3.3
 
-	window = glfwCreateWindow(RENDER_RES_WIDTH, RENDER_RES_HEIGHT, "NF Framework - 0.05a", NULL, NULL);
+	window = glfwCreateWindow(RENDER_RES_WIDTH, RENDER_RES_HEIGHT, "NF Framework - 0.08a", NULL, NULL);
 
 	if (window == NULL) {
 		std::cout << "Error while creating a window, verify if your GPU support GL Version: " <<

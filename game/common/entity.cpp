@@ -52,6 +52,14 @@ void entity::setAction(const ENTITY_ACTION& entityAction) {
 	this->entityAction = entityAction;
 }
 
+/**
+ * setHP
+ * update current entity HP
+ */
+void entity::setHP(const unsigned int& hp) {
+	this->hp = hp;
+}
+
 /*
  * getModel
  * get current model
@@ -79,3 +87,9 @@ const float& entity::getAngle() { return angle; }
  * return current action
  */
 const ENTITY_ACTION& entity::getAction() { return entityAction; }
+
+/**
+ * get HP
+ * return the current entity HP
+ */
+const unsigned int& entity::getHP() { return hp; }

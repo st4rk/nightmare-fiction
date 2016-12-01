@@ -21,6 +21,49 @@ enum FONT_TYPE {
 	FONT_TYPE_BIG   = 1
 };
 
+struct _menu {
+	std::string text;
+
+	float x;
+	float y;
+	float z;
+
+	unsigned int cnt;
+	bool anim;
+	float tick;
+	float tmr;
+
+	std::string tmrText;
+	
+	void checkTmr() {
+		if (anim) {
+			if (tick < glfwGetTime()) {
+				tick = glfwGetTime() + tmr;
+
+				if(cnt >= text.size())
+					anim = false;
+				else
+					tmrText.push_back(text[cnt++]);
+			}
+		}
+	}
+
+};
+
+struct timer {
+	float tick;
+	float tmr;
+	bool enable;
+
+	void run() {
+		if (tick < glfwGetTime()) {
+			tick = glfwGetTime() + tmr;
+			enable = true;
+		} else {
+			enable = false;
+		}
+	}
+};
 
 static const GLfloat vertex_rectangle_data[] = {
    -1.0f, -1.0f, 0.0f,
@@ -60,6 +103,13 @@ struct fadeEffect {
 	bool inOut;
 };
 
+struct RECT {
+	float x;
+	float y;
+	float h;
+	float w;
+};
+
 class utils {
 public:
 	utils();
@@ -73,7 +123,9 @@ public:
 	void render3D_Obj(const modelObj& obj);
 
 	void renderNF3D_anim(unsigned int objNum, unsigned int var, int var2, nf3d* obj);
-	void renderNF3D(const glm::vec3& pos, const float& angle, nf3d* obj);
+	void renderNF3D(const glm::vec3& pos, const float& angle, nf3d* obj, nf3d* obj_2);
+
+	void renderTexture(const GLuint& texID, const RECT& rec1, const RECT& rec, const color& r_Color);
 
 	void setupFadeEffect(const float &speed, const float &r, const float& g, const float& b,const FADE_EFFECT_TYPE& type);
 	void doFadeEffect();
@@ -88,6 +140,7 @@ private:
 	render *m_Render;
 
 	modelObj fontSet;
+	modelObj ui;
 
 	fadeEffect fade;
 	modelObj fadeTexture;

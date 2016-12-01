@@ -5,7 +5,11 @@
  * music chunk
  */
 musicChunk::musicChunk(const std::string& dir) {
-	chunk = nullptr;
+	chunk = Mix_LoadMUS(dir.c_str());
+
+	if (chunk == nullptr) {
+		std::cout << "Error while loading music :" << dir << std::endl;
+	}
 
 }
 
@@ -81,5 +85,15 @@ bool sound::playSoundChunk(Mix_Chunk *chunk, int loop) {
 		std::cout << "SDL_Mix error: " << Mix_GetError() << std::endl;
 		return false;
 	}
+	return true;
+}
+
+bool sound::playMusic(Mix_Music *chunk, int loop) {
+	if (Mix_PlayMusic(chunk, loop) == -1) {
+		std::cout << "Error while playing a music chunk!" << std::endl;
+		std::cout << "SDL_Mix error: " << Mix_GetError() << std::endl;
+		return false;
+	}
+
 	return true;
 }

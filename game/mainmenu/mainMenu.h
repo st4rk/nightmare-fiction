@@ -25,9 +25,12 @@ private:
 	void checkInput();
 
 	std::vector<nTexture*> textureList;
+	std::vector<std::unique_ptr<soundChunk>> soundList;
 
 	MAIN_MENU_LAYERS layers;
 
+	bool inFlash;
+	
 	unsigned char arrow;
 	bool pressed;
 };

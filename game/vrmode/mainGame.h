@@ -10,6 +10,7 @@
 #include "../common/room.h"
 #include "../common/inventory.h"
 #include "../common/AI/zombie.h"
+#include "../common/AI/tyrant.h"
 
 
 /*    in game key list       */
@@ -31,7 +32,8 @@ enum MAIN_GAME_LAYERS {
 	MAIN_GAME_LAYER_INIT,
 	MAIN_GAME_LAYER_GAME,
 	MAIN_GAME_LAYER_INV,
-	MAIN_GAME_LAYER_DOOR
+	MAIN_GAME_LAYER_DOOR,
+	MAIN_GAME_LAYER_OVER
 };
 
 enum SHADER_LIST {
@@ -71,8 +73,7 @@ private:
 
 	/** player model and weapon information */
 	std::unique_ptr<nf3d>  pModel;
-	std::unique_ptr<nf3d>  pWeapon;
-	//std::unique_ptr<nf3d>  eModel;
+	std::vector<std::unique_ptr<nf3d>> pWeapon;
 
 	/** Enemy entity model and information */
 	std::vector<std::unique_ptr<nf3d>> em_List;

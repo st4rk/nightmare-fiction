@@ -32,6 +32,7 @@ public:
 	const STANDARD_SEC2_ANIMATION& getSec2Animation();
 	const STANDARD_SEC4_ANIMATION& getSec4Animation();
 	const unsigned int& getAnimCnt();
+	unsigned int getMaxAnimCnt();
 
 	void run();
 
@@ -46,16 +47,20 @@ public:
 	PLW weapon;
 	std::vector<vertexCnt> vCnt;
 	EMD_SEC2_DATA_T animFrame;
+	EMD_SEC2_DATA_T oldFrame;
+	bool isWeapon;
+	bool isAnimSet;
+	bool isInterpolation;
 
+	float interStep;
+
+	float interTotal;
 private:
 	nTexture* tex;
 	GLuint vbo;
 	
-	bool isInterpolation;
 
-	float interTotal;
-	float interStep;
-	EMD_SEC2_DATA_T oldFrame;
+
 
 	EMD_SECTION_LIST emdSection;
 	STANDARD_SEC2_ANIMATION emdSec2Animation;
@@ -64,7 +69,7 @@ private:
 	/* extra anim set */
 	std::vector<EMD_SEC2_DATA_T> animSet;
 	std::vector<EMD_ANIM_INFO> animSetInfo;
-	bool isAnimSet;
+
 
 	unsigned int animCnt;
 

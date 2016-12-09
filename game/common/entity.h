@@ -26,9 +26,14 @@ public:
 	void setAngle(const float& angle);
 	void setAction(const ENTITY_ACTION& entityAction);
 	void setHP(const unsigned int &hp);
+	void setStatus(const unsigned int& status);
+	void setAI(const unsigned int& ai);
 
 	const unsigned int& getModel();
 	const unsigned int& getHP();
+	const unsigned int& getStatus();
+	const unsigned int& getAI();
+	
 	const glm::vec3& getXYZ();
 	const float& getAngle();
 	const ENTITY_ACTION& getAction();
@@ -42,6 +47,7 @@ private:
 	unsigned int model;
 	unsigned int hp;
 	unsigned int status;
+	unsigned int ai;
 	float angle;
 };
 

@@ -226,9 +226,6 @@ bool PLW::readFile(const std::string& fileName) {
 
     }
 
-   // emdTimTexture.readFromPtr((fileBuffer + PLW_SECTION[3]));
-
-
     delete [] fileBuffer;
     fclose(arq);
 

@@ -286,9 +286,6 @@ EMD::EMD(const std::string& dir) {
             emdQuadTexture[x][y] = *(EMD_QUADTEXTURE_T*)(emdBufferData + (s7ModelOffset + emdObjectBuffer[x].quads.quadTextureOffset+(y*sizeof(EMD_QUADTEXTURE_T))));
         }
     } 
-
-    // nice macgyver St4rk -.-
-    emdTotalObj = 15;
     
     fclose(emdFile);
 }

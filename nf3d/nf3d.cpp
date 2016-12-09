@@ -1,7 +1,7 @@
 #include "nf3d.h"
 
 nf3d::nf3d(const std::string& dir, nTexture* tex, const NF3D_TYPE& type) {
-	isAnimSet = 0;
+	isAnimSet = false;
 
 	// TODO: Improve this, single format to all 3D model
 	switch (type) {
@@ -156,7 +156,7 @@ nf3d::nf3d(const std::string& dir, nTexture* tex, const NF3D_TYPE& type) {
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			animCnt = 0;
-
+			isWeapon = false;
 			isInterpolation = false;
 			interTotal = 0.0f;
 			interStep = 0.0f;
@@ -167,7 +167,154 @@ nf3d::nf3d(const std::string& dir, nTexture* tex, const NF3D_TYPE& type) {
 		break;
 
 		case NF3D_TYPE_PLW: {
-			weapon.readFile(dir);
+			this->weapon.readFile(dir);
+			/* set texture */
+			this->tex = tex;
+
+			/* create a new vbo */
+			glGenBuffers(1, &vbo);
+			glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+			/* build vertex object buffer and send to GPU */
+			std::vector<GLfloat> objectBuffer;
+			unsigned short uPage;
+
+			float width_t = static_cast<float>(tex->texture.getWidth() * 2);
+			float height_t = static_cast<float>(tex->texture.getHeight());
+			
+			vertexCnt node {0,0};
+			for (unsigned int i = 0; i < weapon.sec3Header.objCount / 2; i++) {
+				node.begin += node.total;
+				node.total = 0;
+
+				for (unsigned int j = 0; j < weapon.sec3ModelBuffer[i].triangles.triCount; j++) {
+					/* texture page */
+					uPage = ((weapon.plwTritexture[i][j].page & 0b00111111) * 128);
+					/* vertex 1 */
+					/* xyz */
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwVertex[i][weapon.plwTriangle[i][j].v0].x));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwVertex[i][weapon.plwTriangle[i][j].v0].y));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwVertex[i][weapon.plwTriangle[i][j].v0].z));
+					/* uv */
+					objectBuffer.push_back(static_cast<GLfloat>((weapon.plwTritexture[i][j].u0 + uPage) / width_t));
+					objectBuffer.push_back(static_cast<GLfloat>((weapon.plwTritexture[i][j].v0) / height_t));
+					/* normal to xyz */
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwNormal[i][weapon.plwTriangle[i][j].n0].x));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwNormal[i][weapon.plwTriangle[i][j].n0].y));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwNormal[i][weapon.plwTriangle[i][j].n0].z));
+					/* vertex 1 */
+					/* xyz */
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwVertex[i][weapon.plwTriangle[i][j].v1].x));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwVertex[i][weapon.plwTriangle[i][j].v1].y));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwVertex[i][weapon.plwTriangle[i][j].v1].z));
+					/* uv */
+					objectBuffer.push_back(static_cast<GLfloat>((weapon.plwTritexture[i][j].u1 + uPage) / width_t));
+					objectBuffer.push_back(static_cast<GLfloat>((weapon.plwTritexture[i][j].v1) / height_t));
+					/* normal to xyz */
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwNormal[i][weapon.plwTriangle[i][j].n1].x));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwNormal[i][weapon.plwTriangle[i][j].n1].y));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwNormal[i][weapon.plwTriangle[i][j].n1].z));
+					/* xyz */
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwVertex[i][weapon.plwTriangle[i][j].v2].x));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwVertex[i][weapon.plwTriangle[i][j].v2].y));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwVertex[i][weapon.plwTriangle[i][j].v2].z));
+					/* uv */
+					objectBuffer.push_back(static_cast<GLfloat>((weapon.plwTritexture[i][j].u2 + uPage) / width_t));
+					objectBuffer.push_back(static_cast<GLfloat>((weapon.plwTritexture[i][j].v2) / height_t));
+					/* normal to xyz */
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwNormal[i][weapon.plwTriangle[i][j].n2].x));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwNormal[i][weapon.plwTriangle[i][j].n2].y));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwNormal[i][weapon.plwTriangle[i][j].n2].z));
+
+					node.total += 3;
+				}
+
+				for (unsigned int j = 0; j < weapon.sec3ModelBuffer[i].quads.quadCount; j++) {
+					uPage = ((weapon.plwQuadTexture[i][j].page & 0b00111111) * 128);
+
+					/* TRIANGLE 1 */
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwquadVertex[i][weapon.plwQuad[i][j].v0].x));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwquadVertex[i][weapon.plwQuad[i][j].v0].y));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwquadVertex[i][weapon.plwQuad[i][j].v0].z));
+
+					objectBuffer.push_back(static_cast<GLfloat>((weapon.plwQuadTexture[i][j].u0 + uPage) / width_t));
+					objectBuffer.push_back(static_cast<GLfloat>((weapon.plwQuadTexture[i][j].v0) / height_t));
+
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwNormal[i][weapon.plwQuad[i][j].n0].x));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwNormal[i][weapon.plwQuad[i][j].n0].y));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwNormal[i][weapon.plwQuad[i][j].n0].z));
+
+
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwquadVertex[i][weapon.plwQuad[i][j].v1].x));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwquadVertex[i][weapon.plwQuad[i][j].v1].y));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwquadVertex[i][weapon.plwQuad[i][j].v1].z));
+		 
+					objectBuffer.push_back(static_cast<GLfloat>((weapon.plwQuadTexture[i][j].u1 + uPage) / width_t));
+					objectBuffer.push_back(static_cast<GLfloat>((weapon.plwQuadTexture[i][j].v1) / height_t));;
+
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwNormal[i][weapon.plwQuad[i][j].n1].x));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwNormal[i][weapon.plwQuad[i][j].n1].y));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwNormal[i][weapon.plwQuad[i][j].n1].z));
+
+
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwquadVertex[i][weapon.plwQuad[i][j].v2].x));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwquadVertex[i][weapon.plwQuad[i][j].v2].y));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwquadVertex[i][weapon.plwQuad[i][j].v2].z));
+
+					objectBuffer.push_back(static_cast<GLfloat>((weapon.plwQuadTexture[i][j].u2 + uPage) / width_t));
+					objectBuffer.push_back(static_cast<GLfloat>((weapon.plwQuadTexture[i][j].v2) / height_t));
+
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwNormal[i][weapon.plwQuad[i][j].n2].x));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwNormal[i][weapon.plwQuad[i][j].n2].y));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwNormal[i][weapon.plwQuad[i][j].n2].z));
+
+
+					/* TRIANGLE 2 */
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwquadVertex[i][weapon.plwQuad[i][j].v1].x));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwquadVertex[i][weapon.plwQuad[i][j].v1].y));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwquadVertex[i][weapon.plwQuad[i][j].v1].z));
+		 
+					objectBuffer.push_back(static_cast<GLfloat>((weapon.plwQuadTexture[i][j].u1 + uPage) / width_t));
+					objectBuffer.push_back(static_cast<GLfloat>((weapon.plwQuadTexture[i][j].v1) / height_t));;
+
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwNormal[i][weapon.plwQuad[i][j].n1].x));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwNormal[i][weapon.plwQuad[i][j].n1].y));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwNormal[i][weapon.plwQuad[i][j].n1].z));
+
+
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwquadVertex[i][weapon.plwQuad[i][j].v2].x));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwquadVertex[i][weapon.plwQuad[i][j].v2].y));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwquadVertex[i][weapon.plwQuad[i][j].v2].z));
+
+					objectBuffer.push_back(static_cast<GLfloat>((weapon.plwQuadTexture[i][j].u2 + uPage) / width_t));
+					objectBuffer.push_back(static_cast<GLfloat>((weapon.plwQuadTexture[i][j].v2) / height_t));
+
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwNormal[i][weapon.plwQuad[i][j].n2].x));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwNormal[i][weapon.plwQuad[i][j].n2].y));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwNormal[i][weapon.plwQuad[i][j].n2].z));
+
+
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwquadVertex[i][weapon.plwQuad[i][j].v3].x));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwquadVertex[i][weapon.plwQuad[i][j].v3].y));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwquadVertex[i][weapon.plwQuad[i][j].v3].z));
+
+					objectBuffer.push_back(static_cast<GLfloat>((weapon.plwQuadTexture[i][j].u3 + uPage) / width_t));
+					objectBuffer.push_back(static_cast<GLfloat>((weapon.plwQuadTexture[i][j].v3) / height_t));
+
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwNormal[i][weapon.plwQuad[i][j].n2].x));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwNormal[i][weapon.plwQuad[i][j].n2].y));
+					objectBuffer.push_back(static_cast<GLfloat>(weapon.plwNormal[i][weapon.plwQuad[i][j].n2].z));
+
+					node.total += 6;
+				} 
+			
+				vCnt.push_back(node);
+			}
+			glBufferData(GL_ARRAY_BUFFER, objectBuffer.size() * sizeof(GLfloat), &objectBuffer[0], GL_STATIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+			isWeapon = true;
+
 		}
 		break;
 
@@ -248,21 +395,28 @@ void nf3d::run() {
 		case EMD_SECTION_4:{
 			cAnimSet = model->emdSec4Data;
 			cAnimSetInfo = model->emdSec4AnimInfo;
+
+			if (isAnimSet) {
+				cAnimSet = animSet;
+				cAnimSetInfo = animSetInfo;
+			}
 		}
 		break;
 	}
 
-	if (isAnimSet) {
-		cAnimSet = animSet;
-		cAnimSetInfo = animSetInfo;
-	}
-
-
 
 	if (isInterpolation) {
+		switch (emdSection) {
+			case EMD_SECTION_2:
+				animCnt < cAnimSetInfo[emdSec2Animation].animCount - 1 ? animCnt++ : animCnt = 0;
+				animFrame = cAnimSet[animCnt + cAnimSetInfo[emdSec2Animation].animStart];
+			break;
 
-		animCnt < cAnimSetInfo[emdSec4Animation].animCount - 1 ? animCnt++ : animCnt = 0;
-		animFrame = animSet[animCnt + cAnimSetInfo[emdSec4Animation].animStart];
+			case EMD_SECTION_4:
+				animCnt < cAnimSetInfo[emdSec4Animation].animCount - 1 ? animCnt++ : animCnt = 0;
+				animFrame = cAnimSet[animCnt + cAnimSetInfo[emdSec4Animation].animStart];
+			break;
+		}
 
 		for (unsigned int i = 0; i < animFrame.vector.size(); i++) {
 			if (i > oldFrame.vector.size()) break;
@@ -275,14 +429,28 @@ void nf3d::run() {
 		interTotal < 1.0f ? interTotal += interStep : isInterpolation = false;
 
 	} else { 
-		if (animCnt < cAnimSetInfo[emdSec4Animation].animCount - 1) {
-			animCnt++;
-		} else {
-			animCnt = 0;
-		}
-		
-		animFrame = cAnimSet[animCnt + cAnimSetInfo[emdSec4Animation].animStart];
+		switch (emdSection) {
+			case EMD_SECTION_2:
+				if (animCnt < cAnimSetInfo[emdSec2Animation].animCount - 1) {
+					animCnt++;
+				} else {
+					animCnt = 0;
+				}
+				
+				animFrame = cAnimSet[animCnt + cAnimSetInfo[emdSec2Animation].animStart];
 
+			break;
+
+			case EMD_SECTION_4:
+				if (animCnt < cAnimSetInfo[emdSec4Animation].animCount - 1) {
+					animCnt++;
+				} else {
+					animCnt = 0;
+				}
+				
+				animFrame = cAnimSet[animCnt + cAnimSetInfo[emdSec4Animation].animStart];
+			break;
+		}
 	}	
 }
 
@@ -307,3 +475,23 @@ const EMD_SECTION_LIST& nf3d::getAnimSection() { return emdSection; }
 const STANDARD_SEC2_ANIMATION& nf3d::getSec2Animation() { return emdSec2Animation; }
 const STANDARD_SEC4_ANIMATION& nf3d::getSec4Animation() { return emdSec4Animation; }
 const unsigned int& nf3d::getAnimCnt() { return animCnt; }
+unsigned int nf3d::getMaxAnimCnt() { 
+	
+	if (isAnimSet) {
+		return animSetInfo[emdSec4Animation].animCount - 1;
+	}
+
+	switch (getAnimSection()) {
+		case EMD_SECTION_2:
+			return (model->emdSec2AnimInfo[emdSec2Animation].animCount - 1);
+		break;
+
+		case EMD_SECTION_4: 
+			return (model->emdSec4AnimInfo[emdSec4Animation].animCount - 1);
+		break;
+
+		default:
+			return 0;
+		break;
+	}
+}

@@ -60,6 +60,22 @@ void entity::setHP(const unsigned int& hp) {
 	this->hp = hp;
 }
 
+/**
+ * setStatus
+ * update current entity status
+ */
+void entity::setStatus(const unsigned int& status) {
+	this->status = status;
+}
+
+/**
+ * setAI 
+ * update current entity AI
+ */
+void entity::setAI(const unsigned int& ai) {
+	this->ai = ai;
+}
+
 /*
  * getModel
  * get current model
@@ -93,3 +109,15 @@ const ENTITY_ACTION& entity::getAction() { return entityAction; }
  * return the current entity HP
  */
 const unsigned int& entity::getHP() { return hp; }
+
+/**
+ * get Status
+ * return the current entity status
+ */
+const unsigned int& entity::getStatus() { return status; }
+
+/**
+ * get AI
+ * return current entity AI
+ */
+const unsigned int& entity::getAI() { return ai; }

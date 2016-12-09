@@ -6,6 +6,8 @@ OpenGL 3.3
 
 # Credits
 LodePNG - PNG Image decoder library
+SDL2 - Simple DirectMedia Layer
+SDL2_Mixer
 
 # License
 This project is licensed under the terms of the MIT license.

@@ -25,7 +25,11 @@ void player::setStage(const unsigned int& stage) {
 	this->stage = stage;
 }
 
+void player::setWeapon(const unsigned int& weapon) {
+	this->weapon = weapon;
+}
 
 const unsigned int& player::getMap() { return map; }
 const unsigned int& player::getCam() { return cam; }
 const unsigned int& player::getStage() { return stage; }
+const unsigned int& player::getWeapon() { return weapon; }

@@ -7,26 +7,64 @@
  * verify and update entities after a shoot
  * TODO: Better code
  */
-void shoot(player *p, entity *e) {
+void shoot(player *p, std::vector<entity>& e) {
+	int id = -1;
+	float dist = 1100.0f;
+	printf("Ohay!\n");
+
 	glm::vec3 dir = glm::vec3(cos(glm::radians(p->getAngle())), 
 		                      0.0f,
 		                     -sin(glm::radians(p->getAngle())));
 
-	float D = glm::distance(p->getXYZ(), e->getXYZ());
-	
-	dir = p->getXYZ() + dir * D;
+	for (unsigned int i = 0; i < e.size(); i++) {
+		if (e[i].getAction() != ENTITY_ACTION_DEATH) {
+			float D = glm::distance(p->getXYZ(), e[i].getXYZ());
+			
+			glm::vec3 fdir = p->getXYZ() + dir * D;
 
-	if (glm::distance(e->getXYZ(), dir) < 1000.0f) {		
-		if (e->getHP() > 0) {
-			e->setHP(e->getHP() - 1);
-			if (e->getHP() == 0) {
-				e->setAction(ENTITY_ACTION_DEATH);
-			} else {
-				e->setAction(ENTITY_ACTION_HIT);
+			D = glm::distance(e[i].getXYZ(), fdir);
+
+			if (D < 1000.0f) {
+				if (D < dist) {
+					D = dist;
+					id = i;
+				}
 			}
-		} 
+		}
 	}
 
+	if (id >= 0) {
+		printf("ID: %d\n", id);
+		if (e[id].getHP() > 0) {
+
+			unsigned int dmg = 0;
+
+			switch (p->getWeapon()) {
+				case 0:
+					dmg = 1;
+				break;
+
+				case 1:
+					dmg = 3;
+				break;
+
+				case 2:
+					dmg = 2;
+				break;
+			}
+			
+			
+
+			if ((int)(e[id].getHP() - dmg) <= 0) {
+				e[id].setAction(ENTITY_ACTION_DEATH);
+			} else {
+				e[id].setAction(ENTITY_ACTION_HIT);
+				e[id].setHP(e[id].getHP() - dmg);
+			}
+
+			printf("EHP: %d\n", e[id].getHP());
+		}  
+	}
 }
 
 /*
